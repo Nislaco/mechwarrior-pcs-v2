@@ -8,10 +8,10 @@
       "sourcePath": "AGENTS.md",
       "reason": "project instructions",
       "required": true,
-      "status": "missing",
-      "statusReason": "required context is missing",
+      "status": "selected",
+      "statusReason": "selected within budget",
       "safety": "safe",
-      "chars": 0
+      "chars": 4380
     },
     {
       "sourcePath": ".codex/studio.json",
@@ -20,7 +20,7 @@
       "status": "selected",
       "statusReason": "selected within budget",
       "safety": "safe",
-      "chars": 3394
+      "chars": 3321
     },
     {
       "sourcePath": "design/gdd.md",
@@ -29,7 +29,7 @@
       "status": "selected",
       "statusReason": "selected within budget",
       "safety": "safe",
-      "chars": 449
+      "chars": 408
     },
     {
       "sourcePath": "production/timeline.md",
@@ -47,7 +47,7 @@
       "status": "selected",
       "statusReason": "selected within budget",
       "safety": "safe",
-      "chars": 133
+      "chars": 122
     },
     {
       "sourcePath": "src/project.godot",
@@ -90,7 +90,7 @@
     "maxFiles": 12,
     "maxChars": 48000,
     "maxEntryChars": 16000,
-    "usedFiles": 8,
-    "usedChars": 7216
+    "usedFiles": 9,
+    "usedChars": 11471
   }
 }

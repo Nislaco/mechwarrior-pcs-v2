@@ -2,7 +2,7 @@
 
 # Purpose
 
-MechWarrior 2nd Edition personal-scale character creation companion
+mechwarrior-pcs-v2 concept
 
 # Core Loop
 

@@ -1,0 +1,885 @@
+{
+  "cases": [
+    {
+      "attributes": {
+        "BUILD": 6,
+        "CHARISMA": 6,
+        "INTUITION": 6,
+        "LEARN": 6,
+        "REFLEX": 6
+      },
+      "characteristics": {
+        "Athletic": 6,
+        "Mental": 6,
+        "Physical": 6,
+        "Social": 6
+      },
+      "saving_throws": {
+        "BUILD": 6,
+        "CHARISMA": 6,
+        "INTUITION": 6,
+        "LEARN": 6,
+        "REFLEX": 6
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 0,
+        "CHARISMA": 0,
+        "INTUITION": 0,
+        "LEARN": 0,
+        "REFLEX": 0
+      },
+      "characteristics": {
+        "Athletic": 18,
+        "Mental": 18,
+        "Physical": 18,
+        "Social": 18
+      },
+      "saving_throws": {
+        "BUILD": 18,
+        "CHARISMA": 18,
+        "INTUITION": 18,
+        "LEARN": 18,
+        "REFLEX": 18
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 5,
+        "CHARISMA": 2,
+        "INTUITION": 1,
+        "LEARN": 3,
+        "REFLEX": 4
+      },
+      "characteristics": {
+        "Athletic": 9,
+        "Mental": 14,
+        "Physical": 13,
+        "Social": 15
+      },
+      "saving_throws": {
+        "BUILD": 8,
+        "CHARISMA": 14,
+        "INTUITION": 16,
+        "LEARN": 12,
+        "REFLEX": 10
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 2,
+        "CHARISMA": 1,
+        "INTUITION": 7,
+        "LEARN": 6,
+        "REFLEX": 8
+      },
+      "characteristics": {
+        "Athletic": 8,
+        "Mental": 5,
+        "Physical": 3,
+        "Social": 10
+      },
+      "saving_throws": {
+        "BUILD": 14,
+        "CHARISMA": 16,
+        "INTUITION": 4,
+        "LEARN": 6,
+        "REFLEX": 2
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 8,
+        "CHARISMA": 5,
+        "INTUITION": 6,
+        "LEARN": 6,
+        "REFLEX": 7
+      },
+      "characteristics": {
+        "Athletic": 3,
+        "Mental": 6,
+        "Physical": 5,
+        "Social": 7
+      },
+      "saving_throws": {
+        "BUILD": 2,
+        "CHARISMA": 8,
+        "INTUITION": 6,
+        "LEARN": 6,
+        "REFLEX": 4
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 4,
+        "CHARISMA": 3,
+        "INTUITION": 2,
+        "LEARN": 4,
+        "REFLEX": 5
+      },
+      "characteristics": {
+        "Athletic": 9,
+        "Mental": 12,
+        "Physical": 11,
+        "Social": 13
+      },
+      "saving_throws": {
+        "BUILD": 10,
+        "CHARISMA": 12,
+        "INTUITION": 14,
+        "LEARN": 10,
+        "REFLEX": 8
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 7,
+        "CHARISMA": 7,
+        "INTUITION": 0,
+        "LEARN": 3,
+        "REFLEX": 5
+      },
+      "characteristics": {
+        "Athletic": 6,
+        "Mental": 15,
+        "Physical": 13,
+        "Social": 11
+      },
+      "saving_throws": {
+        "BUILD": 4,
+        "CHARISMA": 4,
+        "INTUITION": 18,
+        "LEARN": 12,
+        "REFLEX": 8
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 7,
+        "CHARISMA": 0,
+        "INTUITION": 5,
+        "LEARN": 2,
+        "REFLEX": 1
+      },
+      "characteristics": {
+        "Athletic": 10,
+        "Mental": 11,
+        "Physical": 12,
+        "Social": 13
+      },
+      "saving_throws": {
+        "BUILD": 4,
+        "CHARISMA": 18,
+        "INTUITION": 8,
+        "LEARN": 14,
+        "REFLEX": 16
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 8,
+        "CHARISMA": 3,
+        "INTUITION": 6,
+        "LEARN": 1,
+        "REFLEX": 3
+      },
+      "characteristics": {
+        "Athletic": 7,
+        "Mental": 11,
+        "Physical": 9,
+        "Social": 9
+      },
+      "saving_throws": {
+        "BUILD": 2,
+        "CHARISMA": 12,
+        "INTUITION": 6,
+        "LEARN": 16,
+        "REFLEX": 12
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 1,
+        "CHARISMA": 8,
+        "INTUITION": 3,
+        "LEARN": 3,
+        "REFLEX": 8
+      },
+      "characteristics": {
+        "Athletic": 9,
+        "Mental": 12,
+        "Physical": 7,
+        "Social": 7
+      },
+      "saving_throws": {
+        "BUILD": 16,
+        "CHARISMA": 2,
+        "INTUITION": 12,
+        "LEARN": 12,
+        "REFLEX": 2
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 2,
+        "CHARISMA": 2,
+        "INTUITION": 1,
+        "LEARN": 0,
+        "REFLEX": 0
+      },
+      "characteristics": {
+        "Athletic": 16,
+        "Mental": 17,
+        "Physical": 17,
+        "Social": 15
+      },
+      "saving_throws": {
+        "BUILD": 14,
+        "CHARISMA": 14,
+        "INTUITION": 16,
+        "LEARN": 18,
+        "REFLEX": 18
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 4,
+        "CHARISMA": 4,
+        "INTUITION": 3,
+        "LEARN": 6,
+        "REFLEX": 7
+      },
+      "characteristics": {
+        "Athletic": 7,
+        "Mental": 9,
+        "Physical": 8,
+        "Social": 11
+      },
+      "saving_throws": {
+        "BUILD": 10,
+        "CHARISMA": 10,
+        "INTUITION": 12,
+        "LEARN": 6,
+        "REFLEX": 4
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 7,
+        "CHARISMA": 3,
+        "INTUITION": 1,
+        "LEARN": 5,
+        "REFLEX": 1
+      },
+      "characteristics": {
+        "Athletic": 10,
+        "Mental": 12,
+        "Physical": 16,
+        "Social": 14
+      },
+      "saving_throws": {
+        "BUILD": 4,
+        "CHARISMA": 12,
+        "INTUITION": 16,
+        "LEARN": 8,
+        "REFLEX": 16
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 0,
+        "CHARISMA": 7,
+        "INTUITION": 3,
+        "LEARN": 3,
+        "REFLEX": 8
+      },
+      "characteristics": {
+        "Athletic": 10,
+        "Mental": 12,
+        "Physical": 7,
+        "Social": 8
+      },
+      "saving_throws": {
+        "BUILD": 18,
+        "CHARISMA": 4,
+        "INTUITION": 12,
+        "LEARN": 12,
+        "REFLEX": 2
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 7,
+        "CHARISMA": 4,
+        "INTUITION": 2,
+        "LEARN": 2,
+        "REFLEX": 5
+      },
+      "characteristics": {
+        "Athletic": 6,
+        "Mental": 14,
+        "Physical": 11,
+        "Social": 12
+      },
+      "saving_throws": {
+        "BUILD": 4,
+        "CHARISMA": 10,
+        "INTUITION": 14,
+        "LEARN": 14,
+        "REFLEX": 8
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 1,
+        "CHARISMA": 1,
+        "INTUITION": 3,
+        "LEARN": 5,
+        "REFLEX": 0
+      },
+      "characteristics": {
+        "Athletic": 17,
+        "Mental": 10,
+        "Physical": 15,
+        "Social": 14
+      },
+      "saving_throws": {
+        "BUILD": 16,
+        "CHARISMA": 16,
+        "INTUITION": 12,
+        "LEARN": 8,
+        "REFLEX": 18
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 1,
+        "CHARISMA": 0,
+        "INTUITION": 8,
+        "LEARN": 3,
+        "REFLEX": 6
+      },
+      "characteristics": {
+        "Athletic": 11,
+        "Mental": 7,
+        "Physical": 4,
+        "Social": 10
+      },
+      "saving_throws": {
+        "BUILD": 16,
+        "CHARISMA": 18,
+        "INTUITION": 2,
+        "LEARN": 12,
+        "REFLEX": 6
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 6,
+        "CHARISMA": 6,
+        "INTUITION": 2,
+        "LEARN": 8,
+        "REFLEX": 8
+      },
+      "characteristics": {
+        "Athletic": 4,
+        "Mental": 8,
+        "Physical": 8,
+        "Social": 10
+      },
+      "saving_throws": {
+        "BUILD": 6,
+        "CHARISMA": 6,
+        "INTUITION": 14,
+        "LEARN": 2,
+        "REFLEX": 2
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 2,
+        "CHARISMA": 3,
+        "INTUITION": 2,
+        "LEARN": 6,
+        "REFLEX": 6
+      },
+      "characteristics": {
+        "Athletic": 10,
+        "Mental": 10,
+        "Physical": 10,
+        "Social": 13
+      },
+      "saving_throws": {
+        "BUILD": 14,
+        "CHARISMA": 12,
+        "INTUITION": 14,
+        "LEARN": 6,
+        "REFLEX": 6
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 4,
+        "CHARISMA": 7,
+        "INTUITION": 6,
+        "LEARN": 5,
+        "REFLEX": 7
+      },
+      "characteristics": {
+        "Athletic": 7,
+        "Mental": 7,
+        "Physical": 5,
+        "Social": 5
+      },
+      "saving_throws": {
+        "BUILD": 10,
+        "CHARISMA": 4,
+        "INTUITION": 6,
+        "LEARN": 8,
+        "REFLEX": 4
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 7,
+        "CHARISMA": 3,
+        "INTUITION": 0,
+        "LEARN": 3,
+        "REFLEX": 7
+      },
+      "characteristics": {
+        "Athletic": 4,
+        "Mental": 15,
+        "Physical": 11,
+        "Social": 15
+      },
+      "saving_throws": {
+        "BUILD": 4,
+        "CHARISMA": 12,
+        "INTUITION": 18,
+        "LEARN": 12,
+        "REFLEX": 4
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 0,
+        "CHARISMA": 1,
+        "INTUITION": 8,
+        "LEARN": 3,
+        "REFLEX": 8
+      },
+      "characteristics": {
+        "Athletic": 10,
+        "Mental": 7,
+        "Physical": 2,
+        "Social": 9
+      },
+      "saving_throws": {
+        "BUILD": 18,
+        "CHARISMA": 16,
+        "INTUITION": 2,
+        "LEARN": 12,
+        "REFLEX": 2
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 8,
+        "CHARISMA": 2,
+        "INTUITION": 0,
+        "LEARN": 5,
+        "REFLEX": 2
+      },
+      "characteristics": {
+        "Athletic": 8,
+        "Mental": 13,
+        "Physical": 16,
+        "Social": 16
+      },
+      "saving_throws": {
+        "BUILD": 2,
+        "CHARISMA": 14,
+        "INTUITION": 18,
+        "LEARN": 8,
+        "REFLEX": 14
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 1,
+        "CHARISMA": 8,
+        "INTUITION": 7,
+        "LEARN": 7,
+        "REFLEX": 2
+      },
+      "characteristics": {
+        "Athletic": 15,
+        "Mental": 4,
+        "Physical": 9,
+        "Social": 3
+      },
+      "saving_throws": {
+        "BUILD": 16,
+        "CHARISMA": 2,
+        "INTUITION": 4,
+        "LEARN": 4,
+        "REFLEX": 14
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 2,
+        "CHARISMA": 5,
+        "INTUITION": 4,
+        "LEARN": 0,
+        "REFLEX": 4
+      },
+      "characteristics": {
+        "Athletic": 12,
+        "Mental": 14,
+        "Physical": 10,
+        "Social": 9
+      },
+      "saving_throws": {
+        "BUILD": 14,
+        "CHARISMA": 8,
+        "INTUITION": 10,
+        "LEARN": 18,
+        "REFLEX": 10
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 4,
+        "CHARISMA": 8,
+        "INTUITION": 3,
+        "LEARN": 7,
+        "REFLEX": 7
+      },
+      "characteristics": {
+        "Athletic": 7,
+        "Mental": 8,
+        "Physical": 8,
+        "Social": 7
+      },
+      "saving_throws": {
+        "BUILD": 10,
+        "CHARISMA": 2,
+        "INTUITION": 12,
+        "LEARN": 4,
+        "REFLEX": 4
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 6,
+        "CHARISMA": 3,
+        "INTUITION": 7,
+        "LEARN": 5,
+        "REFLEX": 7
+      },
+      "characteristics": {
+        "Athletic": 5,
+        "Mental": 6,
+        "Physical": 4,
+        "Social": 8
+      },
+      "saving_throws": {
+        "BUILD": 6,
+        "CHARISMA": 12,
+        "INTUITION": 4,
+        "LEARN": 8,
+        "REFLEX": 4
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 1,
+        "CHARISMA": 7,
+        "INTUITION": 1,
+        "LEARN": 7,
+        "REFLEX": 4
+      },
+      "characteristics": {
+        "Athletic": 13,
+        "Mental": 10,
+        "Physical": 13,
+        "Social": 10
+      },
+      "saving_throws": {
+        "BUILD": 16,
+        "CHARISMA": 4,
+        "INTUITION": 16,
+        "LEARN": 4,
+        "REFLEX": 10
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 1,
+        "CHARISMA": 6,
+        "INTUITION": 6,
+        "LEARN": 8,
+        "REFLEX": 6
+      },
+      "characteristics": {
+        "Athletic": 11,
+        "Mental": 4,
+        "Physical": 6,
+        "Social": 6
+      },
+      "saving_throws": {
+        "BUILD": 16,
+        "CHARISMA": 6,
+        "INTUITION": 6,
+        "LEARN": 2,
+        "REFLEX": 6
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 0,
+        "CHARISMA": 2,
+        "INTUITION": 0,
+        "LEARN": 7,
+        "REFLEX": 3
+      },
+      "characteristics": {
+        "Athletic": 15,
+        "Mental": 11,
+        "Physical": 15,
+        "Social": 16
+      },
+      "saving_throws": {
+        "BUILD": 18,
+        "CHARISMA": 14,
+        "INTUITION": 18,
+        "LEARN": 4,
+        "REFLEX": 12
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 6,
+        "CHARISMA": 7,
+        "INTUITION": 6,
+        "LEARN": 7,
+        "REFLEX": 4
+      },
+      "characteristics": {
+        "Athletic": 8,
+        "Mental": 5,
+        "Physical": 8,
+        "Social": 5
+      },
+      "saving_throws": {
+        "BUILD": 6,
+        "CHARISMA": 4,
+        "INTUITION": 6,
+        "LEARN": 4,
+        "REFLEX": 10
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 0,
+        "CHARISMA": 0,
+        "INTUITION": 8,
+        "LEARN": 5,
+        "REFLEX": 6
+      },
+      "characteristics": {
+        "Athletic": 12,
+        "Mental": 5,
+        "Physical": 4,
+        "Social": 10
+      },
+      "saving_throws": {
+        "BUILD": 18,
+        "CHARISMA": 18,
+        "INTUITION": 2,
+        "LEARN": 8,
+        "REFLEX": 6
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 4,
+        "CHARISMA": 7,
+        "INTUITION": 2,
+        "LEARN": 8,
+        "REFLEX": 6
+      },
+      "characteristics": {
+        "Athletic": 8,
+        "Mental": 8,
+        "Physical": 10,
+        "Social": 9
+      },
+      "saving_throws": {
+        "BUILD": 10,
+        "CHARISMA": 4,
+        "INTUITION": 14,
+        "LEARN": 2,
+        "REFLEX": 6
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 1,
+        "CHARISMA": 3,
+        "INTUITION": 3,
+        "LEARN": 0,
+        "REFLEX": 3
+      },
+      "characteristics": {
+        "Athletic": 14,
+        "Mental": 15,
+        "Physical": 12,
+        "Social": 12
+      },
+      "saving_throws": {
+        "BUILD": 16,
+        "CHARISMA": 12,
+        "INTUITION": 12,
+        "LEARN": 18,
+        "REFLEX": 12
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 5,
+        "CHARISMA": 3,
+        "INTUITION": 0,
+        "LEARN": 8,
+        "REFLEX": 5
+      },
+      "characteristics": {
+        "Athletic": 8,
+        "Mental": 10,
+        "Physical": 13,
+        "Social": 15
+      },
+      "saving_throws": {
+        "BUILD": 8,
+        "CHARISMA": 12,
+        "INTUITION": 18,
+        "LEARN": 2,
+        "REFLEX": 8
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 8,
+        "CHARISMA": 1,
+        "INTUITION": 2,
+        "LEARN": 6,
+        "REFLEX": 5
+      },
+      "characteristics": {
+        "Athletic": 5,
+        "Mental": 10,
+        "Physical": 11,
+        "Social": 15
+      },
+      "saving_throws": {
+        "BUILD": 2,
+        "CHARISMA": 16,
+        "INTUITION": 14,
+        "LEARN": 6,
+        "REFLEX": 8
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 8,
+        "CHARISMA": 2,
+        "INTUITION": 4,
+        "LEARN": 1,
+        "REFLEX": 4
+      },
+      "characteristics": {
+        "Athletic": 6,
+        "Mental": 13,
+        "Physical": 10,
+        "Social": 12
+      },
+      "saving_throws": {
+        "BUILD": 2,
+        "CHARISMA": 14,
+        "INTUITION": 10,
+        "LEARN": 16,
+        "REFLEX": 10
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 7,
+        "CHARISMA": 7,
+        "INTUITION": 5,
+        "LEARN": 5,
+        "REFLEX": 2
+      },
+      "characteristics": {
+        "Athletic": 9,
+        "Mental": 8,
+        "Physical": 11,
+        "Social": 6
+      },
+      "saving_throws": {
+        "BUILD": 4,
+        "CHARISMA": 4,
+        "INTUITION": 8,
+        "LEARN": 8,
+        "REFLEX": 14
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 0,
+        "CHARISMA": 6,
+        "INTUITION": 3,
+        "LEARN": 7,
+        "REFLEX": 3
+      },
+      "characteristics": {
+        "Athletic": 15,
+        "Mental": 8,
+        "Physical": 12,
+        "Social": 9
+      },
+      "saving_throws": {
+        "BUILD": 18,
+        "CHARISMA": 6,
+        "INTUITION": 12,
+        "LEARN": 4,
+        "REFLEX": 12
+      }
+    },
+    {
+      "attributes": {
+        "BUILD": 1,
+        "CHARISMA": 6,
+        "INTUITION": 5,
+        "LEARN": 4,
+        "REFLEX": 7
+      },
+      "characteristics": {
+        "Athletic": 10,
+        "Mental": 9,
+        "Physical": 6,
+        "Social": 7
+      },
+      "saving_throws": {
+        "BUILD": 16,
+        "CHARISMA": 6,
+        "INTUITION": 8,
+        "LEARN": 10,
+        "REFLEX": 4
+      }
+    }
+  ],
+  "generated_from": "mw-depo/mw-script/chargen.py"
+}

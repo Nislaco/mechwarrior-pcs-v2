@@ -1,6 +1,6 @@
 # Market Overview
 
-Audience: MechWarrior 2e RPG players
+Audience: General players
 
 Competitors: none configured
 

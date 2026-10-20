@@ -1,0 +1,1302 @@
+{
+  "Clan Pilot": {
+    "Clan Pilot": {
+      "cost": 16,
+      "kind": "fixed",
+      "skills": {
+        "Gunnery/Aerospace": 4,
+        "Medtech": 1,
+        "Piloting/Aerospace": 3,
+        "Small Arms": 1,
+        "Tactics": 2,
+        "Technician/Aerospace": 2
+      }
+    }
+  },
+  "Clan Warrior": {
+    "Primary Clan Warrior": {
+      "cost": 20,
+      "kind": "fixed",
+      "skills": {
+        "Gunnery/BattleMech": 4,
+        "Interrogation": 1,
+        "Leadership": 1,
+        "Medtech": 1,
+        "Piloting/BattleMech": 3,
+        "Small Arms": 2,
+        "Survival": 1,
+        "Tactics": 2,
+        "Technician/BattleMech": 2,
+        "Unarmed Combat": 1
+      }
+    },
+    "Secondary Clan Warrior": {
+      "cost": 12,
+      "kind": "fixed",
+      "skills": {
+        "Gunnery/BattleMech": 3,
+        "Leadership": 1,
+        "Medtech": 1,
+        "Piloting/BattleMech": 2,
+        "Small Arms": 2,
+        "Survival": 1,
+        "Tactics": 1,
+        "Technician/BattleMech": 1,
+        "Unarmed Combat": 1
+      }
+    }
+  },
+  "Elemental": {
+    "Elemental Package": {
+      "cost": 16,
+      "kind": "fixed",
+      "skills": {
+        "Blade": 1,
+        "Gunnery/Battlesuit": 3,
+        "Interrogation": 1,
+        "Medtech": 1,
+        "Piloting/Battlesuit": 3,
+        "Small Arms": 2,
+        "Survival": 1,
+        "Tactics": 1,
+        "Technician/Battlesuit": 1,
+        "Unarmed Combat": 2
+      }
+    }
+  },
+  "Generic": {
+    "Cavalry Package": {
+      "cost": 13,
+      "kind": "fixed",
+      "skills": {
+        "Drive/Ground": 2,
+        "Gunnery/Artillery": 1,
+        "Gunnery/Conventional": 2,
+        "Small Arms": 2,
+        "Survival": 1,
+        "Technician/Mechanic": 1,
+        "Unarmed Combat": 2
+      }
+    },
+    "Guerrilla Fighter Package": {
+      "cost": 19,
+      "kind": "fixed",
+      "skills": {
+        "Blade": 1,
+        "Demolitions": 1,
+        "Disguise": 1,
+        "Impersonation": 1,
+        "Medtech": 1,
+        "Perception": 2,
+        "Scrounge": 1,
+        "Security Systems": 1,
+        "Small Arms": 2,
+        "Stealth": 2,
+        "Survival": 2,
+        "Tracking": 1,
+        "Unarmed Combat": 2
+      }
+    },
+    "Infantry Package": {
+      "cost": 15,
+      "kind": "fixed",
+      "skills": {
+        "Blade": 1,
+        "Drive/Ground": 1,
+        "Medtech": 1,
+        "Quickdraw": 1,
+        "Small Arms": 3,
+        "Stealth": 2,
+        "Support Weapons": 1,
+        "Survival": 1,
+        "Unarmed Combat": 2
+      }
+    },
+    "MechWarrior Package": {
+      "cost": 13,
+      "kind": "fixed",
+      "skills": {
+        "Gunnery/BattleMech": 2,
+        "Leadership": 1,
+        "Piloting/BattleMech": 2,
+        "Small Arms": 2,
+        "Survival": 1,
+        "Technician/BattleMech": 1,
+        "Unarmed Combat": 2
+      }
+    }
+  },
+  "Human": {
+    "Advanced Academy Package - AEROSPACE PILOT MOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Technician/Aerospace",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Piloting/Aerospace",
+        "Gunnery/Aerospace"
+      ],
+      "skills_at_level": {
+        "1": 2,
+        "2": 2,
+        "3": 2
+      }
+    },
+    "Advanced Academy Package - ARMORED INFANTRY MOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Demolitions",
+        "Technician/Battlesuit",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Gunnery/Battlesuit",
+        "Piloting/Battlesuit"
+      ],
+      "skills_at_level": {
+        "1": 2,
+        "2": 2,
+        "3": 2
+      }
+    },
+    "Advanced Academy Package - BATTLEMECH PILOT MOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Technician/BattleMech",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Piloting/BattleMech",
+        "Gunnery/BattleMech"
+      ],
+      "skills_at_level": {
+        "1": 2,
+        "2": 2,
+        "3": 2
+      }
+    },
+    "Advanced Academy Package - CAVALRY MOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Gunnery/Artillery",
+        "Technician/Mechanic",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Drive/Ground",
+        "Piloting/VTOL",
+        "Gunnery/Conventional",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 2,
+        "2": 2,
+        "3": 2
+      }
+    },
+    "Advanced Academy Package - DROPSHIP PILOT MOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Communications/Conventional",
+        "Computer",
+        "Gunnery/Spacecraft",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Piloting/Spacecraft",
+        "Zero-G Operations",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 2,
+        "2": 2,
+        "3": 2
+      }
+    },
+    "Advanced Academy Package - INFANTRY MOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Drive/Ground",
+        "Gunnery/Artillery",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Unarmed Combat",
+        "Support Weapons"
+      ],
+      "skills_at_level": {
+        "1": 2,
+        "2": 2,
+        "3": 2
+      }
+    },
+    "Advanced Academy Package - MARINE MOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Demolitions",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Zero-G Operations",
+        "Gunnery/Spacecraft"
+      ],
+      "skills_at_level": {
+        "1": 2,
+        "2": 2,
+        "3": 2
+      }
+    },
+    "Advanced Intelligence University Package": {
+      "cost": 21,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 2
+      }
+    },
+    "Advanced Intelligence University Package - COUNTERINTELLIGENCE IOS": {
+      "cost": 21,
+      "elective_skills": [
+        "Escape Artist",
+        "Forgery",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat",
+        "Alternate Identity",
+        "Cryptography",
+        "Protocol",
+        "Seduction"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Disguise",
+        "Impersonation",
+        "Interrogation"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 2
+      }
+    },
+    "Advanced Intelligence University Package - COVERT OPERATIONS IOS": {
+      "cost": 21,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Survival",
+        "Unarmed Combat",
+        "Impersonation",
+        "Protocol",
+        "Scrounge",
+        "Stealth"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Cryptography",
+        "Small Arms",
+        "Tactics"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 2
+      }
+    },
+    "Advanced Intelligence University Package - INFILTRATION IOS": {
+      "cost": 21,
+      "elective_skills": [
+        "Escape Artist",
+        "Interrogation",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat",
+        "Impersonation",
+        "Scrounge",
+        "Special Interests"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Alternate Identity",
+        "Disguise",
+        "Forgery"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 2
+      }
+    },
+    "Advanced Intelligence University Package - LIAISON IOS": {
+      "cost": 21,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat",
+        "Administration",
+        "Communications/Conventional",
+        "Cryptography",
+        "Seduction"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Bureaucracy",
+        "Negotiation",
+        "Protocol"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 2
+      }
+    },
+    "Advanced Intelligence University Package - SPECIAL FORCES IOS": {
+      "cost": 21,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Survival",
+        "Unarmed Combat",
+        "Acrobatics",
+        "Demolitions",
+        "Quickdraw",
+        "Stealth"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Blade",
+        "Small Arms",
+        "Support Weapons"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 2
+      }
+    },
+    "Advanced Intelligence University Package - SURVEILLANCE IOS": {
+      "cost": 21,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat",
+        "Computer",
+        "Engineering",
+        "Tactics"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Communications/Conventional",
+        "Cryptography",
+        "Technician/Electronics"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 2
+      }
+    },
+    "Advanced University Package - AEROSPACE PILOT MOS": {
+      "cost": 18,
+      "elective_skills": [
+        "Technician/Aerospace",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Piloting/Aerospace",
+        "Gunnery/Aerospace"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 2
+      }
+    },
+    "Advanced University Package - ARMORED INFANTRY MOS": {
+      "cost": 18,
+      "elective_skills": [
+        "Demolitions",
+        "Technician/Battlesuit",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Gunnery/Battlesuit",
+        "Piloting/Battlesuit"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 2
+      }
+    },
+    "Advanced University Package - BATTLEMECH PILOT MOS": {
+      "cost": 18,
+      "elective_skills": [
+        "Technician/BattleMech",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Piloting/BattleMech",
+        "Gunnery/BattleMech"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 2
+      }
+    },
+    "Advanced University Package - CAVALRY MOS": {
+      "cost": 18,
+      "elective_skills": [
+        "Gunnery/Artillery",
+        "Technician/Mechanic",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Drive/Ground",
+        "Piloting/VTOL",
+        "Gunnery/Conventional",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 2
+      }
+    },
+    "Advanced University Package - DROPSHIP PILOT MOS": {
+      "cost": 18,
+      "elective_skills": [
+        "Communications/Conventional",
+        "Computer",
+        "Gunnery/Spacecraft",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Piloting/Spacecraft",
+        "Zero-G Operations",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 2
+      }
+    },
+    "Advanced University Package - DROPSHIP PILOT MOS AND JUMPSHIP PILOT FOS ": {
+      "cost": 18,
+      "elective_skills": [
+        "Communications/Conventional",
+        "Gunnery/Spacecraft",
+        "Strategy",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Piloting/Spacecraft",
+        "Zero-G Operations",
+        "Computer",
+        "Navigation",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 2
+      }
+    },
+    "Advanced University Package - INFANTRY MOS": {
+      "cost": 18,
+      "elective_skills": [
+        "Drive/Ground",
+        "Gunnery/Artillery",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Unarmed Combat",
+        "Support Weapons"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 2
+      }
+    },
+    "Advanced University Package - LAM PILOT MOS": {
+      "cost": 18,
+      "elective_skills": [
+        "Technician/Aerospace",
+        "Technician/BattleMech",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Gunnery/BattleMech",
+        "Piloting/BattleMech",
+        "Gunnery/Aerospace",
+        "Piloting/Aerospace",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 2
+      }
+    },
+    "Advanced University Package - MARINE MOS": {
+      "cost": 18,
+      "elective_skills": [
+        "Demolitions",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Zero-G Operations",
+        "Gunnery/Spacecraft"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 2
+      }
+    },
+    "Basic Academy Package - AEROSPACE PILOT MOS": {
+      "cost": 9,
+      "elective_skills": [
+        "Technician/Aerospace",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Piloting/Aerospace",
+        "Gunnery/Aerospace"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 0
+      }
+    },
+    "Basic Academy Package - ARMORED INFANTRY MOS": {
+      "cost": 9,
+      "elective_skills": [
+        "Demolitions",
+        "Technician/Battlesuit",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Gunnery/Battlesuit",
+        "Piloting/Battlesuit"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 0
+      }
+    },
+    "Basic Academy Package - BATTLEMECH PILOT MOS": {
+      "cost": 9,
+      "elective_skills": [
+        "Technician/BattleMech",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Piloting/BattleMech",
+        "Gunnery/BattleMech"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 0
+      }
+    },
+    "Basic Academy Package - CAVALRY MOS": {
+      "cost": 9,
+      "elective_skills": [
+        "Gunnery/Artillery",
+        "Technician/BattleMech",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Drive/Ground",
+        "Piloting/VTOL",
+        "Gunnery/Conventional",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 0
+      }
+    },
+    "Basic Academy Package - DROPSHIP PILOT MOS": {
+      "cost": 9,
+      "elective_skills": [
+        "Communications/Conventional",
+        "Computer",
+        "Gunnery/Spacecraft",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Piloting/Spacecraft",
+        "Zero-G Operations",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 0
+      }
+    },
+    "Basic Academy Package - INFANTRY MOS": {
+      "cost": 9,
+      "elective_skills": [
+        "Drive/Ground",
+        "Gunnery/Artillery",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Unarmed Combat",
+        "Support Weapons"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 0
+      }
+    },
+    "Basic Academy Package - MARINE MOS": {
+      "cost": 9,
+      "elective_skills": [
+        "Demolitions",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Zero-G Operations",
+        "Gunnery/Spacecraft"
+      ],
+      "skills_at_level": {
+        "1": 3,
+        "2": 3,
+        "3": 0
+      }
+    },
+    "Basic Intelligence University Package": {
+      "cost": 15,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise"
+      ],
+      "skills_at_level": {
+        "1": 5,
+        "2": 5
+      }
+    },
+    "Basic Intelligence University Package - COUNTERINTELLIGENCE IOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Escape Artist",
+        "Forgery",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat",
+        "Alternate Identity",
+        "Cryptography",
+        "Protocol",
+        "Seduction"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Disguise",
+        "Impersonation",
+        "Interrogation"
+      ],
+      "skills_at_level": {
+        "1": 5,
+        "2": 5
+      }
+    },
+    "Basic Intelligence University Package - COVERT OPERATIONS IOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Survival",
+        "Unarmed Combat",
+        "Impersonation",
+        "Protocol",
+        "Scrounge",
+        "Stealth"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Cryptography",
+        "Small Arms",
+        "Tactics"
+      ],
+      "skills_at_level": {
+        "1": 5,
+        "2": 5
+      }
+    },
+    "Basic Intelligence University Package - INFILTRATION IOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Escape Artist",
+        "Interrogation",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat",
+        "Impersonation",
+        "Scrounge",
+        "Special Interests"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Alternate Identity",
+        "Disguise",
+        "Forgery"
+      ],
+      "skills_at_level": {
+        "1": 5,
+        "2": 5
+      }
+    },
+    "Basic Intelligence University Package - LIAISON IOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat",
+        "Administration",
+        "Communications/Conventional",
+        "Cryptography",
+        "Seduction"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Bureaucracy",
+        "Negotiation",
+        "Protocol"
+      ],
+      "skills_at_level": {
+        "1": 5,
+        "2": 5
+      }
+    },
+    "Basic Intelligence University Package - SPECIAL FORCES IOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Survival",
+        "Unarmed Combat",
+        "Acrobatics",
+        "Demolitions",
+        "Quickdraw",
+        "Stealth"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Blade",
+        "Small Arms",
+        "Support Weapons"
+      ],
+      "skills_at_level": {
+        "1": 5,
+        "2": 5
+      }
+    },
+    "Basic Intelligence University Package - SURVEILLANCE IOS": {
+      "cost": 15,
+      "elective_skills": [
+        "Disguise",
+        "Escape Artist",
+        "Forgery",
+        "Interrogation",
+        "Small Arms",
+        "Survival",
+        "Unarmed Combat",
+        "Computer",
+        "Engineering",
+        "Tactics"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Perception",
+        "Security Systems",
+        "Streetwise",
+        "Communications/Conventional",
+        "Cryptography",
+        "Technician/Electronics"
+      ],
+      "skills_at_level": {
+        "1": 5,
+        "2": 5
+      }
+    },
+    "Basic University Package - AEROSPACE PILOT MOS": {
+      "cost": 12,
+      "elective_skills": [
+        "Technician/Aerospace",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Piloting/Aerospace",
+        "Gunnery/Aerospace"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 0
+      }
+    },
+    "Basic University Package - ARMORED INFANTRY MOS": {
+      "cost": 12,
+      "elective_skills": [
+        "Demolitions",
+        "Technician/Battlesuit",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Gunnery/Battlesuit",
+        "Piloting/Battlesuit"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 0
+      }
+    },
+    "Basic University Package - BATTLEMECH PILOT MOS": {
+      "cost": 12,
+      "elective_skills": [
+        "Technician/BattleMech",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Piloting/BattleMech",
+        "Gunnery/BattleMech"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 0
+      }
+    },
+    "Basic University Package - CAVALRY MOS": {
+      "cost": 12,
+      "elective_skills": [
+        "Gunnery/Artillery",
+        "Technician/BattleMech",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Drive/Ground",
+        "Piloting/VTOL",
+        "Gunnery/Conventional",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 0
+      }
+    },
+    "Basic University Package - DROPSHIP PILOT MOS": {
+      "cost": 12,
+      "elective_skills": [
+        "Communications/Conventional",
+        "Computer",
+        "Gunnery/Spacecraft",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Piloting/Spacecraft",
+        "Zero-G Operations",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 0
+      }
+    },
+    "Basic University Package - DROPSHIP PILOT MOS AND JUMPSHIP PILOT FOS ": {
+      "cost": 12,
+      "elective_skills": [
+        "Communications/Conventional",
+        "Gunnery/Spacecraft",
+        "Strategy",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Piloting/Spacecraft",
+        "Zero-G Operations",
+        "Computer",
+        "Navigation",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 0
+      }
+    },
+    "Basic University Package - INFANTRY MOS": {
+      "cost": 12,
+      "elective_skills": [
+        "Drive/Ground",
+        "Gunnery/Artillery",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Survival"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Unarmed Combat",
+        "Support Weapons"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 0
+      }
+    },
+    "Basic University Package - LAM PILOT MOS": {
+      "cost": 12,
+      "elective_skills": [
+        "Technician/Aerospace",
+        "Technician/BattleMech",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Gunnery/BattleMech",
+        "Piloting/BattleMech",
+        "Gunnery/Aerospace",
+        "Piloting/Aerospace",
+        "Medtech",
+        "Small Arms"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 0
+      }
+    },
+    "Basic University Package - MARINE MOS": {
+      "cost": 12,
+      "elective_skills": [
+        "Demolitions",
+        "Bureaucracy",
+        "Blade",
+        "Leadership",
+        "Support Weapons",
+        "Survival",
+        "Unarmed Combat"
+      ],
+      "kind": "flexible",
+      "required_skills": [
+        "Medtech",
+        "Small Arms",
+        "Zero-G Operations",
+        "Gunnery/Spacecraft"
+      ],
+      "skills_at_level": {
+        "1": 4,
+        "2": 4,
+        "3": 0
+      }
+    }
+  }
+}
