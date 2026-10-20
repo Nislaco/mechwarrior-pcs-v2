@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "product": "codex-game-studio",
+  "projectStage": "prototype",
+  "studioMode": "guided-studio",
+  "entries": [
+    {
+      "sourcePath": "AGENTS.md",
+      "reason": "project instructions",
+      "required": true,
+      "status": "missing",
+      "statusReason": "required context is missing",
+      "safety": "safe",
+      "chars": 0
+    },
+    {
+      "sourcePath": ".codex/studio.json",
+      "reason": "project state",
+      "required": true,
+      "status": "selected",
+      "statusReason": "selected within budget",
+      "safety": "safe",
+      "chars": 3394
+    },
+    {
+      "sourcePath": "design/gdd.md",
+      "reason": "design reference",
+      "required": true,
+      "status": "selected",
+      "statusReason": "selected within budget",
+      "safety": "safe",
+      "chars": 449
+    },
+    {
+      "sourcePath": "production/timeline.md",
+      "reason": "production reference",
+      "required": false,
+      "status": "selected",
+      "statusReason": "selected within budget",
+      "safety": "safe",
+      "chars": 197
+    },
+    {
+      "sourcePath": "docs/market-overview.md",
+      "reason": "market reference",
+      "required": false,
+      "status": "selected",
+      "statusReason": "selected within budget",
+      "safety": "safe",
+      "chars": 133
+    },
+    {
+      "sourcePath": "src/project.godot",
+      "reason": "godot engine reference",
+      "required": true,
+      "status": "selected",
+      "statusReason": "selected within budget",
+      "safety": "safe",
+      "chars": 62
+    },
+    {
+      "sourcePath": "docs/engine-reference/godot/VERSION.md",
+      "reason": "godot version applicability and official links",
+      "required": true,
+      "status": "selected",
+      "statusReason": "selected within budget",
+      "safety": "safe",
+      "chars": 1005
+    },
+    {
+      "sourcePath": "docs/engine-reference/godot/current-best-practices.md",
+      "reason": "godot current best practices and default guardrails",
+      "required": true,
+      "status": "selected",
+      "statusReason": "selected within budget",
+      "safety": "safe",
+      "chars": 1026
+    },
+    {
+      "sourcePath": "docs/engine-reference/godot/gameplay.md",
+      "reason": "godot gameplay implementation reference",
+      "required": false,
+      "status": "selected",
+      "statusReason": "selected within budget",
+      "safety": "safe",
+      "chars": 950
+    }
+  ],
+  "budget": {
+    "maxFiles": 12,
+    "maxChars": 48000,
+    "maxEntryChars": 16000,
+    "usedFiles": 8,
+    "usedChars": 7216
+  }
+}

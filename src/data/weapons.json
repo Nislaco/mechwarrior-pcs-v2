@@ -1,0 +1,75 @@
+{
+  "melee_weapons": [
+    {"name": "Bayonet", "tech_level": 1, "availability": "A", "legality": "A", "cost": 5, "damage": "1D6 + 3"},
+    {"name": "Cudgel/Blackjack", "tech_level": 1, "availability": "A", "legality": "A", "cost": 1, "damage": "1D6 + 1"},
+    {"name": "Club", "tech_level": 1, "availability": "A", "legality": "A", "cost": 1, "damage": "1D6 + 2"},
+    {"name": "Dagger/Knife", "tech_level": 1, "availability": "A", "legality": "A", "cost": 2, "damage": "1D6 - 1"},
+    {"name": "Neural Lash", "tech_level": 3, "availability": "C", "legality": "C", "cost": 750, "damage": "1D6 - 1, special"},
+    {"name": "Neural Whip", "tech_level": 3, "availability": "C", "legality": "B", "cost": 500, "damage": "1D6 + special"},
+    {"name": "Sword", "tech_level": 1, "availability": "A", "legality": "B", "cost": 10, "damage": "2D6 + 2"},
+    {"name": "Stunstick", "tech_level": 2, "availability": "B", "legality": "A", "cost": 200, "damage": "1D6 - 2 + special"},
+    {"name": "Mini Stunstick", "tech_level": 3, "availability": "B", "legality": "A", "cost": 50, "damage": "1D6 - 4 + special"},
+    {"name": "Vibroaxe", "tech_level": 3, "availability": "C", "legality": "B", "cost": 150, "damage": "3D6 + 3"},
+    {"name": "Vibroblade", "tech_level": 2, "availability": "A", "legality": "B", "cost": 100, "damage": "3D6"},
+    {"name": "Vibroblade", "tech_level": 2, "availability": "B", "legality": "B", "cost": 25, "damage": "2D6"},
+    {"name": "Vibrokatana", "tech_level": 3, "availability": "C", "legality": "B", "cost": 350, "damage": "2D6 + 5"}
+  ],
+  "archery": [
+    {"name": "Crossbow, Heavy", "tech_level": 1, "availability": "A", "legality": "A", "cost": 20, "damage": "2D6 + 3"},
+    {"name": "Crossbow, Light", "tech_level": 1, "availability": "A", "legality": "A", "cost": 10, "damage": "2D6"},
+    {"name": "Longbow", "tech_level": 1, "availability": "A", "legality": "A", "cost": 20, "damage": "1D6 + 3"},
+    {"name": "Shortbow", "tech_level": 1, "availability": "A", "legality": "A", "cost": 10, "damage": "1D6 + 1"}
+  ],
+  "pistols": [
+    {"name": "Auto-Pistol", "tech_level": 1, "availability": "A", "legality": "C", "cost": 50, "damage": "2D6"},
+    {"name": "Hold-Out Pistol", "tech_level": 1, "availability": "A", "legality": "C", "cost": 20, "damage": "1D6 + 3"},
+    {"name": "Mandrake Hold-Out", "tech_level": 1, "availability": "A", "legality": "C", "cost": 20, "damage": "1D6 + 3"},
+    {"name": "Gauss Pistol", "tech_level": 3, "availability": "C", "legality": "C", "cost": 750, "damage": "4D6 + 2"},
+    {"name": "Mydron Pistol", "tech_level": 1, "availability": "A", "legality": "C", "cost": 100, "damage": "1D6 + 3"},
+    {"name": "Standard Pistol", "tech_level": 1, "availability": "A", "legality": "C", "cost": 40, "damage": "2D6 + 3"},
+    {"name": "Sternsnacht Pistol", "tech_level": 1, "availability": "A", "legality": "C", "cost": 200, "damage": "4D6 + 2"},
+    {"name": "Dart Gun", "tech_level": 3, "availability": "B", "legality": "B", "cost": 40, "damage": "special"},
+    {"name": "Sonic Stunner", "tech_level": 2, "availability": "B", "legality": "B", "cost": 100, "damage": "special"},
+    {"name": "Tranq Gun", "tech_level": 1, "availability": "B", "legality": "B", "cost": 30, "damage": "special"},
+    {"name": "Blazer Pistol", "tech_level": 3, "availability": "C", "legality": "D", "cost": 3000, "damage": "3D6 x 2"},
+    {"name": "Intek White Dwarf Hold-Out", "tech_level": 3, "availability": "C", "legality": "D", "cost": 250, "damage": "3D6"},
+    {"name": "Nakjama Pistol", "tech_level": 3, "availability": "B", "legality": "C", "cost": 750, "damage": "3D6"},
+    {"name": "Pulse Laser Pistol", "tech_level": 3, "availability": "C", "legality": "C", "cost": 1000, "damage": "3D6"},
+    {"name": "Standard Laser Pistol", "tech_level": 3, "availability": "B", "legality": "C", "cost": 750, "damage": "4D6"},
+    {"name": "Sunbeam Pistol", "tech_level": 3, "availability": "B", "legality": "C", "cost": 750, "damage": "5D6"},
+    {"name": "Hold-Out Needler Pistol", "tech_level": 3, "availability": "A", "legality": "C", "cost": 20, "damage": "1D6"},
+    {"name": "Shredder Heavy Needler", "tech_level": 3, "availability": "B", "legality": "C", "cost": 150, "damage": "4D6 + 4"},
+    {"name": "Needler Pistol", "tech_level": 3, "availability": "A", "legality": "C", "cost": 50, "damage": "1D6 + 2"},
+    {"name": "Flamer Pistol", "tech_level": 3, "availability": "B", "legality": "C", "cost": 50, "damage": "2D6"}
+  ],
+  "rifles": [
+    {"name": "Fed. Long Rifle", "tech_level": 1, "availability": "A", "legality": "C", "cost": 120, "damage": "2D6 + 2"},
+    {"name": "Fed. Arms Thunderstroke Gauss Rifle", "tech_level": 3, "availability": "D", "legality": "C", "cost": 2500, "damage": "4D6 + 9"},
+    {"name": "Minolta 9000 Advanced Sniper System", "tech_level": 3, "availability": "C", "legality": "C", "cost": 1000, "damage": "4D6"},
+    {"name": "Needler Rifle", "tech_level": 3, "availability": "A", "legality": "C", "cost": 75, "damage": "2D6 + 2"},
+    {"name": "Standard Rifle", "tech_level": 1, "availability": "A", "legality": "C", "cost": 80, "damage": "3D6"},
+    {"name": "Zeus Heavy Rifle", "tech_level": 1, "availability": "A", "legality": "C", "cost": 200, "damage": "6D6"},
+    {"name": "Shotgun", "tech_level": 1, "availability": "A", "legality": "B", "cost": 30, "damage": "3D6 + 2"},
+    {"name": "Pump Shotgun", "tech_level": 1, "availability": "A", "legality": "B", "cost": 40, "damage": "3D6 + 2"},
+    {"name": "Intek Laser Rifle", "tech_level": 3, "availability": "B", "legality": "C", "cost": 1250, "damage": "2D6 + 2"},
+    {"name": "Pulse Laser Rifle", "tech_level": 3, "availability": "C", "legality": "C", "cost": 2000, "damage": "3D6 + 2"},
+    {"name": "Standard Laser Rifle", "tech_level": 3, "availability": "B", "legality": "C", "cost": 1250, "damage": "4D6 + 2"},
+    {"name": "Starfire ER Laser Rifle", "tech_level": 3, "availability": "C", "legality": "C", "cost": 2500, "damage": "3D6 + 3"}
+  ],
+  "smgs": [
+    {"name": "SMG", "tech_level": 1, "availability": "A", "legality": "C", "cost": 80, "damage": "3D6"},
+    {"name": "Imperator SMG", "tech_level": 1, "availability": "A", "legality": "C", "cost": 100, "damage": "2D6"},
+    {"name": "Rorynex SMG", "tech_level": 1, "availability": "A", "legality": "C", "cost": 80, "damage": "3D6 + 3"}
+  ],
+  "gyrojet": [
+    {"name": "GyroSlug Carbine", "tech_level": 2, "availability": "B", "legality": "C", "cost": 500, "damage": "2D6 + 5"},
+    {"name": "GyroSlug Rifle", "tech_level": 2, "availability": "B", "legality": "C", "cost": 1000, "damage": "3D6 + 3"},
+    {"name": "Gyrojet Rifle", "tech_level": 2, "availability": "B", "legality": "C", "cost": 1250, "damage": "3D6 + 6"},
+    {"name": "Gyrojet Heavy Gun", "tech_level": 2, "availability": "B", "legality": "C", "cost": 2500, "damage": "6D6 + 6"},
+    {"name": "Gyrojet Pistol", "tech_level": 2, "availability": "B", "legality": "C", "cost": 1250, "damage": "3D6 + 3"}
+  ],
+  "support_weapons": [
+    {"name": "Hellbore Assault Laser", "tech_level": 4, "availability": "C", "legality": "C", "cost": 2500, "damage": "8D6 + 8"},
+    {"name": "Fed. Arms Grand Mauler Gauss Cannon", "tech_level": 3, "availability": "C", "legality": "D", "cost": 5000, "damage": "5D6 + 17"}
+  ]
+}

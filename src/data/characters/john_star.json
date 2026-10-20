@@ -1,0 +1,89 @@
+{
+  "version": "1.0",
+  "exported": "2026-10-07T12:18:55.698693",
+  "character": {
+    "name": "John Star",
+    "race": "Human",
+    "age": 28,
+    "height": 183,
+    "weight": 82,
+    "attributes": {
+      "STRENGTH": 6,
+      "REFLEX": 5,
+      "INTUITION": 4,
+      "MEMORY": 3,
+      "LEARN": 4
+    },
+    "characteristics": {
+      "MUSCLES": 12,
+      "BODY": 10,
+      "NERVES": 9,
+      "MIND": 7
+    },
+    "saving_throws": {
+      "REFLEX": 5,
+      "INTUITION": 4,
+      "MEMORY": 3
+    },
+    "advantages": [
+      "Combat Sense (2)",
+      "Wealth (5,000 C-Bills) (1)"
+    ],
+    "skills": {
+      "Guns (Pistols)": 3,
+      "Guns (Rifles)": 2,
+      "Unarmed Combat": 2,
+      "Small Craft (Hovercraft)": 1,
+      "Knowledge (Military)": 2
+    },
+    "skill_targets": {
+      "Guns (Pistols)": 9,
+      "Guns (Rifles)": 10,
+      "Unarmed Combat": 11
+    },
+    "equipment": [
+      {
+        "name": "Standard Laser Pistol",
+        "type": "weapon",
+        "damage": 8
+      },
+      {
+        "name": "Standard Laser Rifle",
+        "type": "weapon",
+        "damage": 6
+      },
+      {
+        "name": "Flak Jacket",
+        "type": "armor",
+        "defense": 1
+      },
+      {
+        "name": "MechWarrior Combat Suit",
+        "type": "armor",
+        "cost": 20000
+      },
+      {
+        "name": "Combat Neurohelmet",
+        "type": "equipment",
+        "cost": 1400
+      },
+      {
+        "name": "Neurohelmet",
+        "type": "equipment",
+        "cost": 900
+      },
+      {
+        "name": "Noteputer",
+        "type": "electronics",
+        "cost": 500
+      },
+      {
+        "name": "Medipatch",
+        "type": "medical",
+        "cost": 10
+      }
+    ],
+    "credits": 5000,
+    "notes": "Former mercenary, now freelance. Skilled with laser weapons. Standard Inner Sphere equipment."
+  }
+}

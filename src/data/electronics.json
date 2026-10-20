@@ -1,0 +1,46 @@
+{
+  "power_packs": [
+    {"name": "Standard Power Pack", "tech_level": 2, "availability": "A", "legality": "A", "cost": 5, "power_capacity": 20},
+    {"name": "Quick-Charge Power Pack", "tech_level": 3, "availability": "B", "legality": "A", "cost": 10, "power_capacity": 10},
+    {"name": "High-Capacity Power Pack", "tech_level": 3, "availability": "B", "legality": "A", "cost": 15, "power_capacity": 30},
+    {"name": "Satchel Battery", "tech_level": 2, "availability": "A", "legality": "A", "cost": 20, "power_capacity": 100},
+    {"name": "Quick-Charge Satchel Battery", "tech_level": 3, "availability": "B", "legality": "A", "cost": 40, "power_capacity": 50},
+    {"name": "High-Capacity Satchel Battery", "tech_level": 3, "availability": "B", "legality": "A", "cost": 60, "power_capacity": 150},
+    {"name": "Military Power Pack", "tech_level": 2, "availability": "A", "legality": "B", "cost": 40, "power_capacity": 200},
+    {"name": "Quick-Charge Military Power Pack", "tech_level": 3, "availability": "B", "legality": "B", "cost": 80, "power_capacity": 100},
+    {"name": "High-Capacity Military Power Pack", "tech_level": 3, "availability": "B", "legality": "B", "cost": 120, "power_capacity": 300},
+    {"name": "Fossil Fuel Recharger", "tech_level": 2, "availability": "A", "legality": "A", "cost": 50, "power_capacity": 5},
+    {"name": "Kinetic Recharger", "tech_level": 2, "availability": "A", "legality": "A", "cost": 10, "power_capacity": 15},
+    {"name": "Solar Recharger", "tech_level": 2, "availability": "B", "legality": "B", "cost": 200, "power_capacity": 45}
+  ],
+  "misc_equipment": [
+    {"name": "Noteputer", "tech_level": 2, "availability": "B", "legality": "A", "cost": 500, "power_use": "1/hr"},
+    {"name": "Jump Pack", "tech_level": 3, "availability": "B", "legality": "B", "cost": 3100, "power_use": "200 (refuel)"},
+    {"name": "Basic Field Kit", "tech_level": 2, "availability": "A", "legality": "A", "cost": 10},
+    {"name": "Deluxe Field Kit", "tech_level": 3, "availability": "A", "legality": "A", "cost": 100},
+    {"name": "Emergency Jetpack", "tech_level": 3, "availability": "D", "legality": "C", "cost": 5000},
+    {"name": "Grapple Rod", "tech_level": 3, "availability": "D", "legality": "C", "cost": 500},
+    {"name": "Aerospace Repair Kit", "tech_level": 2, "availability": "A", "legality": "A", "cost": 2500},
+    {"name": "BattleMech Repair Kit", "tech_level": 3, "availability": "A", "legality": "A", "cost": 3000},
+    {"name": "Electronics Repair Kit", "tech_level": 2, "availability": "A", "legality": "A", "cost": 2000},
+    {"name": "Mechanic Repair Kit", "tech_level": 2, "availability": "A", "legality": "A", "cost": 1000},
+    {"name": "Weapons Repair Kit", "tech_level": 2, "availability": "A", "legality": "A", "cost": 1500},
+    {"name": "Basic Tool Kit", "tech_level": 1, "availability": "A", "legality": "A", "cost": 250},
+    {"name": "Deluxe Tool Kit", "tech_level": 3, "availability": "A", "legality": "A", "cost": 500},
+    {"name": "Scanalyzer", "tech_level": 4, "availability": "C", "legality": "B", "cost": 5000, "power_use": "1"},
+    {"name": "Personal Comm.", "tech_level": 2, "availability": "A", "legality": "A", "cost": 50},
+    {"name": "Long-Range Personal Comm.", "tech_level": 3, "availability": "A", "legality": "A", "cost": 200, "power_use": "1/hr"},
+    {"name": "Basic Field Communications Kit", "tech_level": 2, "availability": "A", "legality": "A", "cost": 400, "power_use": "1/20 min"},
+    {"name": "Microcommunicator", "tech_level": 3, "availability": "B", "legality": "B", "cost": 200}
+  ],
+  "espionage": [
+    {"name": "Basic Security Bypass Kit", "tech_level": 1, "availability": "A", "legality": "B", "cost": 100},
+    {"name": "Advanced Security Bypass Kit", "tech_level": 3, "availability": "C", "legality": "D", "cost": 900, "power_use": "1 pt/min"},
+    {"name": "Camo Suit ECM", "tech_level": 3, "availability": "B", "legality": "D", "cost": 7000},
+    {"name": "Camo Suit IR Suppression", "tech_level": 3, "availability": "B", "legality": "D", "cost": 7000},
+    {"name": "Camo Suit Sneak", "tech_level": 3, "availability": "B", "legality": "D", "cost": 7000},
+    {"name": "Camo Suit IR & ECM", "tech_level": 3, "availability": "C", "legality": "D", "cost": 21000},
+    {"name": "Camo Suit Sneak & ECM", "tech_level": 3, "availability": "C", "legality": "D", "cost": 21000},
+    {"name": "Camo Suit Sneak & IR", "tech_level": 3, "availability": "C", "legality": "D", "cost": 21000}
+  ]
+}

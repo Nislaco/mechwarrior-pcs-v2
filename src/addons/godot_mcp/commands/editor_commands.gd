@@ -1,0 +1,814 @@
+@tool
+extends "res://addons/godot_mcp/commands/base_command.gd"
+
+
+func get_commands() -> Dictionary:
+	return {
+		"get_editor_errors": _get_editor_errors,
+		"get_runtime_errors": _get_runtime_errors,
+		"clear_runtime_errors": _clear_runtime_errors,
+		"get_output_log": _get_output_log,
+		"get_editor_screenshot": _get_editor_screenshot,
+		"get_game_screenshot": _get_game_screenshot,
+		"execute_editor_script": _execute_editor_script,
+		"clear_output": _clear_output,
+		"reload_plugin": _reload_plugin,
+		"reload_project": _reload_project,
+		"get_signals": _get_signals,
+		"compare_screenshots": _compare_screenshots,
+		"set_auto_dismiss": _set_auto_dismiss,
+		"get_editor_camera": _get_editor_camera,
+		"set_editor_camera": _set_editor_camera,
+	}
+
+
+func get_command_schemas() -> Dictionary:
+	return {
+		"get_editor_errors": {
+			"category": "editor",
+			"summary": "Collects recent errors/warnings from the Output panel, script editor compile errors, GDScript analyzer messages, and the debugger Errors tab.",
+			"params": {
+				"max_lines": {"type": "int", "required": false, "default": 50, "desc": "How many trailing Output panel / log lines to scan"},
+			},
+			"annotations": {"readOnly": true, "destructive": false, "idempotent": true},
+		},
+		"get_runtime_errors": {
+			"category": "editor",
+			"summary": "Structured runtime errors/warnings captured from the running game (push_error/SCRIPT ERROR/unhandled GDScript exceptions), with file/function/line and a full call stack per entry — not the merged string list get_editor_errors returns. Backed by a ring buffer fed off the debugger's message stream; empty if no game has run since the editor opened.",
+			"params": {
+				"since_seq": {"type": "int", "required": false, "default": 0, "desc": "Only return entries with seq greater than this — poll with the highest seq from a previous call to get only new errors, race-free even across clear_runtime_errors"},
+				"max": {"type": "int", "required": false, "default": 50, "desc": "Maximum entries to return"},
+				"include_warnings": {"type": "bool", "required": false, "default": true, "desc": "Include warning-level entries, not just errors"},
+			},
+			"annotations": {"readOnly": true, "destructive": false, "idempotent": true},
+		},
+		"clear_runtime_errors": {
+			"category": "editor",
+			"summary": "Empties the runtime error buffer. The sequence counter is NOT reset, so a caller holding an old since_seq value continues to get correct results instead of the buffer appearing to restart.",
+			"params": {},
+			"annotations": {"readOnly": false, "destructive": false, "idempotent": true},
+		},
+		"get_output_log": {
+			"category": "editor",
+			"summary": "Reads recent lines from the editor Output panel, falling back to the log file if the panel isn't accessible.",
+			"params": {
+				"max_lines": {"type": "int", "required": false, "default": 100, "desc": "How many trailing lines to return"},
+				"filter": {"type": "string", "required": false, "default": "", "desc": "Only return lines containing this substring"},
+			},
+			"annotations": {"readOnly": true, "destructive": false, "idempotent": true},
+		},
+		"get_editor_screenshot": {
+			"category": "editor",
+			"summary": "Captures the editor's main viewport as a PNG, returned as base64 or saved to disk. Refuses to overwrite an existing file at save_path unless overwrite is set.",
+			"params": {
+				"save_path": {"type": "string", "required": false, "default": "", "desc": "If given, save PNG here (res://, user://, or absolute) instead of returning base64"},
+				"overwrite": {"type": "bool", "required": false, "default": false, "desc": "Overwrite an existing file at save_path"},
+			},
+			"annotations": {"readOnly": false, "destructive": false, "idempotent": true},
+		},
+		"get_game_screenshot": {
+			"category": "editor",
+			"summary": "Captures a screenshot from the running game via file-based IPC. Requires a scene to be playing. Refuses to overwrite an existing file at save_path unless overwrite is set.",
+			"params": {
+				"save_path": {"type": "string", "required": false, "default": "", "desc": "If given, save PNG here (res://, user://, or absolute) instead of returning base64"},
+				"overwrite": {"type": "bool", "required": false, "default": false, "desc": "Overwrite an existing file at save_path"},
+			},
+			"annotations": {"readOnly": false, "destructive": false, "idempotent": true},
+		},
+		"execute_editor_script": {
+			"category": "editor",
+			"summary": "Compiles and runs arbitrary GDScript in the editor process. Refuses code matching known file/resource-write APIs unless allow_unsafe_editor_io is set.",
+			"params": {
+				"code": {"type": "string", "required": true, "desc": "GDScript source for a run() function body"},
+				"allow_unsafe_editor_io": {"type": "bool", "required": false, "default": false, "desc": "Bypass the unsafe file/resource-write pattern guard"},
+			},
+			"annotations": {"readOnly": false, "destructive": true, "idempotent": false, "confirm": true},
+		},
+		"clear_output": {
+			"category": "editor",
+			"summary": "Clears the editor Output panel by printing blank lines.",
+			"params": {},
+			"annotations": {"readOnly": false, "destructive": true, "idempotent": true},
+		},
+		"reload_plugin": {
+			"category": "editor",
+			"summary": "Disables and re-enables the godot_mcp plugin to reload its scripts. The MCP connection briefly drops and auto-reconnects.",
+			"params": {},
+			"annotations": {"readOnly": false, "destructive": false, "idempotent": true},
+		},
+		"reload_project": {
+			"category": "editor",
+			"summary": "Rescans the project filesystem to pick up changed/added scripts and resources.",
+			"params": {},
+			"annotations": {"readOnly": false, "destructive": false, "idempotent": true},
+		},
+		"get_signals": {
+			"category": "editor",
+			"summary": "Lists a node's declared signals, their argument shapes, and current connections.",
+			"params": {
+				"node_path": {"type": "string", "required": true, "desc": "Path to the node, relative to the edited scene root"},
+			},
+			"annotations": {"readOnly": true, "destructive": false, "idempotent": true},
+		},
+		"compare_screenshots": {
+			"category": "editor",
+			"summary": "Pixel-diffs two images (path or base64 PNG) of equal size and returns a highlighted diff image plus a changed-pixel percentage.",
+			"params": {
+				"image_a": {"type": "string", "required": true, "desc": "res://, user:// path, or base64 PNG data"},
+				"image_b": {"type": "string", "required": true, "desc": "res://, user:// path, or base64 PNG data"},
+				"threshold": {"type": "int", "required": false, "default": 10, "desc": "Per-channel 0-255 difference above which a pixel counts as changed"},
+			},
+			"annotations": {"readOnly": true, "destructive": false, "idempotent": true},
+		},
+		"set_auto_dismiss": {
+			"category": "editor",
+			"summary": "Toggles whether the plugin auto-dismisses blocking editor dialogs.",
+			"params": {
+				"enabled": {"type": "bool", "required": false, "default": true},
+			},
+			"annotations": {"readOnly": false, "destructive": false, "idempotent": true},
+		},
+		"get_editor_camera": {
+			"category": "editor",
+			"summary": "Reads the 3D editor viewport camera's position, rotation, FOV, and clip planes.",
+			"params": {},
+			"annotations": {"readOnly": true, "destructive": false, "idempotent": true},
+		},
+		"set_editor_camera": {
+			"category": "editor",
+			"summary": "Sets the 3D editor viewport camera's position, rotation, look-at target, and/or FOV. look_at overrides rotation_degrees when both are given.",
+			"params": {
+				"position": {"type": "object", "required": false, "desc": "{x, y, z}; unspecified components keep their current value"},
+				"rotation_degrees": {"type": "object", "required": false, "desc": "{x, y, z}; unspecified components keep their current value"},
+				"look_at": {"type": "object", "required": false, "desc": "{x, y, z} world point to aim the camera at; overrides rotation_degrees"},
+				"fov": {"type": "float", "required": false, "desc": "Vertical field of view in degrees"},
+			},
+			"annotations": {"readOnly": false, "destructive": false, "idempotent": true},
+		},
+	}
+
+
+func _get_editor_errors(params: Dictionary) -> Dictionary:
+	var errors: Array = []
+	var max_lines: int = optional_int(params, "max_lines", 50)
+	var base: Control = get_editor().get_base_control()
+
+	# 1. Read from the editor's Output panel (EditorLog RichTextLabel)
+	#    This captures runtime errors, warnings, and print output
+	var editor_log: Node = base.find_child("Output", true, false)
+	if editor_log:
+		var rtl: RichTextLabel = _find_rtl(editor_log)
+		if rtl:
+			var content: String = rtl.get_parsed_text()
+			var lines: PackedStringArray = content.split("\n")
+			var start: int = maxi(0, lines.size() - max_lines)
+			for i in range(start, lines.size()):
+				var line: String = lines[i]
+				if line.contains("ERROR") or line.contains("SCRIPT ERROR") or line.contains("Parse Error") or line.contains("WARNING"):
+					errors.append(line.strip_edges())
+
+	# 2. Check the script editor for compile errors (red background lines)
+	#    These don't appear in the Output panel
+	var script_errors: Array = []
+	var script_editor: ScriptEditor = EditorInterface.get_script_editor()
+	if script_editor:
+		var current_script: Script = script_editor.get_current_script()
+		var ce: CodeEdit = _find_code_edit(script_editor)
+		if ce and current_script:
+			var script_path: String = current_script.resource_path
+			for i in range(ce.get_line_count()):
+				var bg: Color = ce.get_line_background_color(i)
+				if bg.r > 0.8 and bg.a > 0:  # Red-ish background = error
+					var line_text: String = ce.get_line(i).strip_edges()
+					script_errors.append("COMPILE ERROR: %s:%d - %s" % [script_path, i + 1, line_text])
+
+	# 3. Read from script editor error/warning panels (GDScript analyzer messages)
+	#    Each open script editor has a VSplitContainer with two RichTextLabels:
+	#    child[1] = warnings panel, child[2] = errors panel
+	var analyzer_errors: Array = []
+	if script_editor:
+		var open_editors: Array = script_editor.get_open_script_editors()
+		var open_scripts: Array = script_editor.get_open_scripts()
+		for ei in range(open_editors.size()):
+			var editor_node: Node = open_editors[ei]
+			var script_path: String = ""
+			if ei < open_scripts.size() and open_scripts[ei] != null:
+				script_path = (open_scripts[ei] as Resource).resource_path
+			var vsplit: VSplitContainer = null
+			for c in editor_node.get_children():
+				if c is VSplitContainer:
+					vsplit = c as VSplitContainer
+					break
+			if vsplit == null:
+				continue
+			var children: Array = vsplit.get_children()
+			# child[1] = warnings panel (RichTextLabel)
+			if children.size() > 1 and children[1] is RichTextLabel:
+				var text: String = (children[1] as RichTextLabel).get_parsed_text().strip_edges()
+				if not text.is_empty():
+					for line in text.split("\n"):
+						var stripped: String = line.strip_edges()
+						if stripped.is_empty() or stripped == "[Ignore]":
+							continue
+						# Remove leading "[Ignore]" prefix from warning lines
+						stripped = stripped.trim_prefix("[Ignore]")
+						var prefix: String = "WARNING: %s:" % script_path if not script_path.is_empty() else "WARNING: "
+						analyzer_errors.append(prefix + stripped)
+			# child[2] = errors panel (RichTextLabel)
+			if children.size() > 2 and children[2] is RichTextLabel:
+				var text: String = (children[2] as RichTextLabel).get_parsed_text().strip_edges()
+				if not text.is_empty():
+					for line in text.split("\n"):
+						var stripped: String = line.strip_edges()
+						if stripped.is_empty():
+							continue
+						var prefix: String = "SCRIPT ERROR: %s:" % script_path if not script_path.is_empty() else "SCRIPT ERROR: "
+						analyzer_errors.append(prefix + stripped)
+
+	# 4. Runtime errors from mcp_error_store.gd, fed by mcp_debugger_plugin.gd's
+	#    hook on ScriptEditorDebugger's "debug_data" signal — structured
+	#    file/line/backtrace, not a Tree-widget scrape. See get_runtime_errors
+	#    for the structured form; this is a flat string rendering for callers
+	#    of get_editor_errors that just want one merged list.
+	var debugger_errors: Array = []
+	var store: RefCounted = editor_plugin.error_store if "error_store" in editor_plugin else null
+	if store != null:
+		for entry: Dictionary in store.get_since(0, max_lines, true):
+			var tag: String = "DEBUGGER WARNING" if entry.get("is_warning", false) else "DEBUGGER ERROR"
+			debugger_errors.append("%s: %s:%d - %s" % [
+				tag, entry.get("file", ""), entry.get("line", 0), entry.get("description", entry.get("error", "")),
+			])
+
+	# Fallback: read from log file if Output panel not accessible
+	if errors.size() == 0 and script_errors.size() == 0 and analyzer_errors.size() == 0 and debugger_errors.size() == 0:
+		var log_path := "user://logs/godot.log"
+		if FileAccess.file_exists(log_path):
+			var file := FileAccess.open(log_path, FileAccess.READ)
+			if file:
+				var content := file.get_as_text()
+				file.close()
+				var lines := content.split("\n")
+				var start: int = maxi(0, lines.size() - max_lines)
+				for i in range(start, lines.size()):
+					var line: String = lines[i]
+					if line.contains("ERROR") or line.contains("SCRIPT ERROR"):
+						errors.append(line.strip_edges())
+
+	errors.append_array(script_errors)
+	errors.append_array(analyzer_errors)
+	errors.append_array(debugger_errors)
+	return success({"errors": errors, "count": errors.size()})
+
+
+func _get_runtime_errors(params: Dictionary) -> Dictionary:
+	var store: RefCounted = editor_plugin.error_store if "error_store" in editor_plugin else null
+	if store == null:
+		return error_internal("Runtime error store not initialized")
+
+	var since_seq: int = optional_int(params, "since_seq", 0)
+	var max_count: int = optional_int(params, "max", 50)
+	var include_warnings: bool = optional_bool(params, "include_warnings", true)
+
+	var entries: Array[Dictionary] = store.get_since(since_seq, max_count, include_warnings)
+	return success({
+		"errors": entries,
+		"count": entries.size(),
+		"latest_seq": store.current_seq(),
+	})
+
+
+func _clear_runtime_errors(_params: Dictionary) -> Dictionary:
+	var store: RefCounted = editor_plugin.error_store if "error_store" in editor_plugin else null
+	if store == null:
+		return error_internal("Runtime error store not initialized")
+	store.clear()
+	return success({"cleared": true, "seq_preserved": store.current_seq()})
+
+
+func _get_output_log(params: Dictionary) -> Dictionary:
+	var max_lines: int = optional_int(params, "max_lines", 100)
+	var filter: String = optional_string(params, "filter", "")
+	var base: Control = get_editor().get_base_control()
+
+	var editor_log: Node = base.find_child("Output", true, false)
+	if editor_log == null:
+		# Fallback: read from log file
+		var log_path := "user://logs/godot.log"
+		if not FileAccess.file_exists(log_path):
+			return error_internal("Output panel not found and no log file available")
+		var file := FileAccess.open(log_path, FileAccess.READ)
+		if file == null:
+			return error_internal("Cannot read log file")
+		var content := file.get_as_text()
+		file.close()
+		var lines := content.split("\n")
+		var start: int = maxi(0, lines.size() - max_lines)
+		var output_lines: Array = []
+		for i in range(start, lines.size()):
+			var line: String = lines[i]
+			if filter.is_empty() or line.contains(filter):
+				output_lines.append(line)
+		return success({"lines": output_lines, "count": output_lines.size(), "source": "log_file"})
+
+	var rtl: RichTextLabel = _find_rtl(editor_log)
+	if rtl == null:
+		return error_internal("Could not find RichTextLabel in Output panel")
+
+	var content: String = rtl.get_parsed_text()
+	var all_lines: PackedStringArray = content.split("\n")
+	var start: int = maxi(0, all_lines.size() - max_lines)
+	var output_lines: Array = []
+	for i in range(start, all_lines.size()):
+		var line: String = all_lines[i]
+		if filter.is_empty() or line.contains(filter):
+			output_lines.append(line)
+
+	return success({"lines": output_lines, "count": output_lines.size(), "source": "output_panel"})
+
+
+func _find_code_edit(node: Node, depth: int = 0) -> CodeEdit:
+	if depth > 8:
+		return null
+	if node is CodeEdit:
+		return node as CodeEdit
+	for child in node.get_children():
+		var found: CodeEdit = _find_code_edit(child, depth + 1)
+		if found:
+			return found
+	return null
+
+
+func _find_rtl(node: Node, depth: int = 0) -> RichTextLabel:
+	if depth > 6:
+		return null
+	if node is RichTextLabel:
+		return node as RichTextLabel
+	for child in node.get_children():
+		var found: RichTextLabel = _find_rtl(child, depth + 1)
+		if found:
+			return found
+	return null
+
+
+func _get_editor_screenshot(params: Dictionary) -> Dictionary:
+	# Capture the editor's main viewport - no await to avoid timeout
+	var base_control: Control = get_editor().get_base_control()
+	if base_control == null:
+		return error_internal("Could not access editor base control")
+
+	var viewport: Viewport = base_control.get_viewport()
+	if viewport == null:
+		return error_internal("Could not access editor viewport")
+
+	var texture: ViewportTexture = viewport.get_texture()
+	if texture == null:
+		return error_internal("Could not get viewport texture")
+
+	var image: Image = texture.get_image()
+	if image == null:
+		return error_internal("Could not get image from viewport")
+
+	var save_path: String = params.get("save_path", "")
+	if save_path != "":
+		var overwrite_guard := guard_overwrite(save_path, optional_bool(params, "overwrite"))
+		if overwrite_guard.has("error"):
+			return overwrite_guard
+		var abs_path := resolve_save_path(save_path)
+		var err := image.save_png(abs_path)
+		if err != OK:
+			return error_internal("Failed to save screenshot: %s" % error_string(err))
+		return success({
+			"saved_path": save_path,
+			"width": image.get_width(),
+			"height": image.get_height(),
+			"format": "png",
+		})
+
+	var png_buffer := image.save_png_to_buffer()
+	var base64 := Marshalls.raw_to_base64(png_buffer)
+
+	return success({
+		"image_base64": base64,
+		"width": image.get_width(),
+		"height": image.get_height(),
+		"format": "png",
+	})
+
+
+func _get_game_screenshot(params: Dictionary) -> Dictionary:
+	var ei := get_editor()
+	if not ei.is_playing_scene():
+		return error(-32000, "No scene is currently playing", {"suggestion": "Use play_scene first"})
+
+	# Communicate with the game process via file system
+	var user_dir := get_game_user_dir()
+	var request_path := user_dir + "/mcp_screenshot_request"
+	var screenshot_path := user_dir + "/mcp_screenshot.png"
+
+	# Clean up any stale screenshot file
+	if FileAccess.file_exists(screenshot_path):
+		DirAccess.remove_absolute(screenshot_path)
+
+	# Create the request file to signal the game process
+	var req := FileAccess.open(request_path, FileAccess.WRITE)
+	if req == null:
+		return error_internal("Could not create screenshot request file")
+	req.close()
+
+	# Poll for the screenshot file (max 3 seconds, 0.1s interval)
+	var attempts := 30
+	while attempts > 0:
+		await get_tree().create_timer(0.1).timeout
+		if FileAccess.file_exists(screenshot_path):
+			break
+		attempts -= 1
+
+	if not FileAccess.file_exists(screenshot_path):
+		# Clean up request file if it still exists
+		if FileAccess.file_exists(request_path):
+			DirAccess.remove_absolute(request_path)
+		return error(-32000, "Screenshot timed out", {
+			"suggestion": "Ensure the game is running and MCPScreenshot autoload is active",
+		})
+
+	# Load the PNG file
+	var image := Image.new()
+	var err := image.load(screenshot_path)
+	if err != OK:
+		DirAccess.remove_absolute(screenshot_path)
+		return error_internal("Failed to load screenshot: %s" % error_string(err))
+
+	# Clean up temp file
+	DirAccess.remove_absolute(screenshot_path)
+
+	var save_path_param: String = params.get("save_path", "")
+	if save_path_param != "":
+		var overwrite_guard := guard_overwrite(save_path_param, optional_bool(params, "overwrite"))
+		if overwrite_guard.has("error"):
+			return overwrite_guard
+		var abs_path := resolve_save_path(save_path_param)
+		var save_err := image.save_png(abs_path)
+		if save_err != OK:
+			return error_internal("Failed to save screenshot: %s" % error_string(save_err))
+		return success({
+			"saved_path": save_path_param,
+			"width": image.get_width(),
+			"height": image.get_height(),
+			"format": "png",
+		})
+
+	var png_buffer := image.save_png_to_buffer()
+	var base64 := Marshalls.raw_to_base64(png_buffer)
+
+	return success({
+		"image_base64": base64,
+		"width": image.get_width(),
+		"height": image.get_height(),
+		"format": "png",
+	})
+
+
+func _execute_editor_script(params: Dictionary) -> Dictionary:
+	var result := require_string(params, "code")
+	if result[1] != null:
+		return result[1]
+	var code: String = result[0]
+	var allow_unsafe_editor_io: bool = optional_bool(params, "allow_unsafe_editor_io", false)
+	var unsafe_guard := _guard_editor_script_file_io(code, allow_unsafe_editor_io)
+	if not unsafe_guard.is_empty():
+		return unsafe_guard
+
+	# Wrap user code in a @tool script.
+	# The wrapper returns a sentinel rather than _mcp_output, so a caller that
+	# never returns anything of its own does not get the printed output echoed
+	# back a second time as an escaped string in return_value.
+	var wrapped_code := """@tool
+extends Node
+
+var _mcp_output: Array = []
+# Read back through `self` below, so a same-named local in the caller's code
+# cannot shadow it.
+var _mcp_sentinel := RefCounted.new()
+
+func _mcp_print(value: Variant) -> void:
+	_mcp_output.append(str(value))
+
+func run() -> Variant:
+	# User code begins
+%s
+	# User code ends
+	return self._mcp_sentinel
+""" % _indent_code(code)
+
+	# Create a temporary script
+	var script := GDScript.new()
+	script.source_code = wrapped_code
+	var err := script.reload()
+
+	if err != OK:
+		return error(-32002, "Script compilation failed", {
+			"error": error_string(err),
+			"code": wrapped_code,
+		})
+
+	# Create temp node and execute
+	var temp_node := Node.new()
+	temp_node.set_script(script)
+	add_child(temp_node)
+
+	var output: Variant = null
+
+	# Execute with error handling
+	if temp_node.has_method("run"):
+		output = temp_node.run()
+
+	var mcp_output: Array = []
+	var raw_output: Variant = temp_node.get("_mcp_output")
+	if raw_output is Array:
+		mcp_output = raw_output
+
+	# Read the sentinel before freeing the node that owns it.
+	var sentinel: Variant = temp_node.get("_mcp_sentinel")
+
+	# Cleanup
+	temp_node.queue_free()
+
+	# Suppress only the sentinel. An explicit `return null` from the caller's
+	# code is a real return value and stays distinguishable from no return.
+	# The sentinel is an object identity rather than a magic string, because
+	# any string a caller might return is a legitimate result.
+	var payload := {"output": mcp_output}
+	if not (output is RefCounted and output == sentinel):
+		payload["return_value"] = str(output) if output != null else null
+	return success(payload)
+
+
+func _guard_editor_script_file_io(code: String, allow_unsafe_editor_io: bool) -> Dictionary:
+	if allow_unsafe_editor_io:
+		return {}
+	var compact := code.replace(" ", "").replace("\t", "").replace("\n", "")
+	var unsafe_patterns: Array[String] = []
+	if compact.contains("ResourceSaver.save("):
+		unsafe_patterns.append("ResourceSaver.save")
+	if compact.contains("ProjectSettings.save("):
+		unsafe_patterns.append("ProjectSettings.save")
+	if compact.contains("ConfigFile.save("):
+		unsafe_patterns.append("ConfigFile.save")
+	if compact.contains("FileAccess.open(") and _contains_any(compact, ["FileAccess.WRITE", "FileAccess.READ_WRITE", "FileAccess.WRITE_READ"]):
+		unsafe_patterns.append("FileAccess.open WRITE")
+	if _contains_any(compact, ["DirAccess.remove_absolute(", "DirAccess.rename_absolute(", "DirAccess.copy_absolute(", "DirAccess.make_dir_absolute(", "DirAccess.make_dir_recursive_absolute("]):
+		unsafe_patterns.append("DirAccess filesystem mutation")
+	if unsafe_patterns.is_empty():
+		return {}
+	return error_conflict(
+		"Refusing to execute editor script with direct file/resource write APIs",
+		{
+			"unsafe_patterns": unsafe_patterns,
+			"open_scenes": get_open_scene_paths(),
+			"suggestion": "Use dedicated MCP commands and save_scene for editor-owned resources, or pass allow_unsafe_editor_io=true only when no open editor resource can be overwritten.",
+			"note": "This is a text match on the submitted source, meant to catch accidents. It is not a security boundary: a dynamically built call, or a destructive API not on the list, is not caught.",
+		}
+	)
+
+
+func _contains_any(value: String, needles: Array[String]) -> bool:
+	for needle: String in needles:
+		if value.contains(needle):
+			return true
+	return false
+
+
+func _indent_code(code: String) -> String:
+	var lines := code.split("\n")
+	var indented: PackedStringArray = []
+	for line in lines:
+		indented.append("\t" + line)
+	return "\n".join(indented)
+
+
+func _clear_output(params: Dictionary) -> Dictionary:
+	print("\n".repeat(50))
+	return success({"cleared": true})
+
+
+func _reload_plugin(params: Dictionary) -> Dictionary:
+	# Disable and re-enable this plugin to reload all scripts
+	var plugin_name := "godot_mcp"
+	var ei := get_editor()
+
+	# Send success BEFORE reloading (connection will briefly drop)
+	# Use call_deferred so the response is sent first
+	_deferred_reload_plugin.call_deferred(ei, plugin_name)
+	return success({"reloading": true, "message": "Plugin will reload momentarily. Connection will briefly drop and auto-reconnect."})
+
+
+func _deferred_reload_plugin(ei: EditorInterface, plugin_name: String) -> void:
+	ei.set_plugin_enabled(plugin_name, false)
+	ei.set_plugin_enabled(plugin_name, true)
+	print("[MCP] Plugin reloaded")
+
+
+func _reload_project(params: Dictionary) -> Dictionary:
+	# Rescan filesystem and reload changed scripts
+	var ei := get_editor()
+	ei.get_resource_filesystem().scan()
+
+	return success({"reloaded": true, "message": "Filesystem rescanned."})
+
+
+func _get_signals(params: Dictionary) -> Dictionary:
+	var result := require_string(params, "node_path")
+	if result[1] != null:
+		return result[1]
+	var node_path: String = result[0]
+
+	var root := get_edited_root()
+	if root == null:
+		return error_no_scene()
+
+	var node := find_node_by_path(node_path)
+	if node == null:
+		return error_not_found("Node '%s'" % node_path)
+
+	var signals: Array = []
+	for sig in node.get_signal_list():
+		var sig_info: Dictionary = {
+			"name": sig["name"],
+			"args": [],
+		}
+		for arg in sig["args"]:
+			sig_info["args"].append({"name": arg["name"], "type": arg["type"]})
+
+		# Get connections for this signal
+		var connections: Array = []
+		for conn in node.get_signal_connection_list(sig["name"]):
+			connections.append({
+				"target": str(root.get_path_to(conn["callable"].get_object())),
+				"method": conn["callable"].get_method(),
+			})
+		sig_info["connections"] = connections
+		signals.append(sig_info)
+
+	return success({
+		"node_path": str(root.get_path_to(node)),
+		"type": node.get_class(),
+		"signals": signals,
+		"count": signals.size(),
+	})
+
+
+func _load_image_from_param(value: String, label: String) -> Array:
+	## Returns [Image, null] on success or [null, error_dict] on failure.
+	## Accepts a file path (res://, user://) or raw base64 PNG data.
+	var img := Image.new()
+	if value.begins_with("res://") or value.begins_with("user://"):
+		var err := img.load(value)
+		if err != OK:
+			return [null, error_invalid_params("Failed to load %s from path '%s': %s" % [label, value, error_string(err)])]
+		return [img, null]
+	# Treat as base64 PNG
+	var buf := Marshalls.base64_to_raw(value)
+	var err := img.load_png_from_buffer(buf)
+	if err != OK:
+		return [null, error_invalid_params("Failed to decode %s from base64: %s" % [label, error_string(err)])]
+	return [img, null]
+
+
+func _compare_screenshots(params: Dictionary) -> Dictionary:
+	var result := require_string(params, "image_a")
+	if result[1] != null:
+		return result[1]
+	var image_a_value: String = result[0]
+
+	var result2 := require_string(params, "image_b")
+	if result2[1] != null:
+		return result2[1]
+	var image_b_value: String = result2[0]
+
+	var threshold: int = optional_int(params, "threshold", 10)
+
+	# Load images (from path or base64)
+	var load_a := _load_image_from_param(image_a_value, "image_a")
+	if load_a[1] != null:
+		return load_a[1]
+	var img_a: Image = load_a[0]
+
+	var load_b := _load_image_from_param(image_b_value, "image_b")
+	if load_b[1] != null:
+		return load_b[1]
+	var img_b: Image = load_b[0]
+
+	if img_a.get_size() != img_b.get_size():
+		return error_invalid_params("Image sizes differ: %s vs %s" % [str(img_a.get_size()), str(img_b.get_size())])
+
+	var width := img_a.get_width()
+	var height := img_a.get_height()
+	var diff_image := Image.create(width, height, false, Image.FORMAT_RGBA8)
+
+	var changed_pixels: int = 0
+	var total_pixels: int = width * height
+
+	for y in height:
+		for x in width:
+			var ca: Color = img_a.get_pixel(x, y)
+			var cb: Color = img_b.get_pixel(x, y)
+			var dr := absi(int(ca.r8) - int(cb.r8))
+			var dg := absi(int(ca.g8) - int(cb.g8))
+			var db := absi(int(ca.b8) - int(cb.b8))
+			var max_diff := maxi(dr, maxi(dg, db))
+			if max_diff > threshold:
+				changed_pixels += 1
+				# Red highlight for changed pixels
+				diff_image.set_pixel(x, y, Color(1, 0, 0, clampf(float(max_diff) / 255.0, 0.3, 1.0)))
+			else:
+				# Dim version of original
+				diff_image.set_pixel(x, y, Color(ca.r * 0.3, ca.g * 0.3, ca.b * 0.3, 1.0))
+
+	var diff_percentage: float = (float(changed_pixels) / float(total_pixels)) * 100.0
+	var identical: bool = changed_pixels == 0
+
+	# Encode diff image
+	var diff_png := diff_image.save_png_to_buffer()
+	var diff_base64 := Marshalls.raw_to_base64(diff_png)
+
+	return success({
+		"identical": identical,
+		"changed_pixels": changed_pixels,
+		"total_pixels": total_pixels,
+		"diff_percentage": snappedf(diff_percentage, 0.01),
+		"threshold": threshold,
+		"width": width,
+		"height": height,
+		"diff_image_base64": diff_base64,
+	})
+
+
+func _get_editor_camera(_params: Dictionary) -> Dictionary:
+	var vp3d := EditorInterface.get_editor_viewport_3d()
+	var cam := vp3d.get_camera_3d() if vp3d else null
+	if not cam:
+		return error(-32000, "No 3D editor camera found", {
+			"suggestion": "Make sure a 3D scene is open in the editor",
+		})
+	var pos := cam.global_position
+	var rot := cam.rotation_degrees
+	return success({
+		"position": {"x": pos.x, "y": pos.y, "z": pos.z},
+		"rotation_degrees": {"x": rot.x, "y": rot.y, "z": rot.z},
+		"fov": cam.fov,
+		"near": cam.near,
+		"far": cam.far,
+	})
+
+
+func _set_editor_camera(params: Dictionary) -> Dictionary:
+	var vp3d := EditorInterface.get_editor_viewport_3d()
+	var cam := vp3d.get_camera_3d() if vp3d else null
+	if not cam:
+		return error(-32000, "No 3D editor camera found", {
+			"suggestion": "Make sure a 3D scene is open in the editor",
+		})
+
+	# Set position
+	if params.has("position"):
+		var p: Dictionary = params["position"]
+		cam.global_position = Vector3(
+			float(p.get("x", cam.global_position.x)),
+			float(p.get("y", cam.global_position.y)),
+			float(p.get("z", cam.global_position.z)),
+		)
+
+	# Set rotation
+	if params.has("rotation_degrees"):
+		var r: Dictionary = params["rotation_degrees"]
+		cam.rotation_degrees = Vector3(
+			float(r.get("x", cam.rotation_degrees.x)),
+			float(r.get("y", cam.rotation_degrees.y)),
+			float(r.get("z", cam.rotation_degrees.z)),
+		)
+
+	# Look at target (overrides rotation if set)
+	if params.has("look_at"):
+		var t: Dictionary = params["look_at"]
+		cam.look_at(Vector3(float(t.get("x", 0)), float(t.get("y", 0)), float(t.get("z", 0))))
+
+	# Set FOV
+	if params.has("fov"):
+		cam.fov = optional_float(params, "fov")
+
+	var pos := cam.global_position
+	var rot := cam.rotation_degrees
+	return success({
+		"position": {"x": pos.x, "y": pos.y, "z": pos.z},
+		"rotation_degrees": {"x": rot.x, "y": rot.y, "z": rot.z},
+		"fov": cam.fov,
+	})
+
+
+func _set_auto_dismiss(params: Dictionary) -> Dictionary:
+	var enabled: bool = params.get("enabled", true)
+	editor_plugin.auto_dismiss_dialogs = enabled
+	return success({
+		"auto_dismiss": enabled,
+		"message": "Auto-dismiss dialogs %s" % ("enabled" if enabled else "disabled"),
+	})

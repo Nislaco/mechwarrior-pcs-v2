@@ -1,0 +1,22 @@
+{
+  "characters": [
+    {
+      "name": "John Star",
+      "file": "john_star.json",
+      "race": "Human",
+      "role": "Frontline Combatant"
+    },
+    {
+      "name": "Viper",
+      "file": "viper.json",
+      "race": "Clan",
+      "role": "Stealth/Infiltration"
+    },
+    {
+      "name": "Dr. Sarah Chen",
+      "file": "dr_sarah_chen.json",
+      "race": "Human",
+      "role": "Support/Field Medic"
+    }
+  ]
+}

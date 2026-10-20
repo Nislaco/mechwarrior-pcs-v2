@@ -1,0 +1,18 @@
+{
+  "equipment": [
+    {"name": "Type I Simple Limb", "tech_level": 1, "availability": "A", "legality": "A", "cost": 75},
+    {"name": "Type II Useful Limb", "tech_level": 2, "availability": "A", "legality": "A", "cost": 750},
+    {"name": "Type III Prosthesis", "tech_level": 2, "availability": "B", "legality": "A", "cost": 7500},
+    {"name": "Type IV Advanced Prosthesis", "tech_level": 3, "availability": "C", "legality": "A", "cost": 25000},
+    {"name": "Type V Myomer Replacement", "tech_level": 4, "availability": "D", "legality": "A", "cost": 200000},
+    {"name": "Myomer Implantation Device", "tech_level": 4, "availability": "D", "legality": "B", "cost": 175000},
+    {"name": "Bionic Ear Replacement", "tech_level": 3, "availability": "B", "legality": "A", "cost": 100000},
+    {"name": "Bionic Eye Replacement", "tech_level": 3, "availability": "D", "legality": "A", "cost": 220000},
+    {"name": "Medipatch", "tech_level": 3, "availability": "A", "legality": "A", "cost": 10},
+    {"name": "Sedative Patch", "tech_level": 3, "availability": "A", "legality": "B", "cost": 30},
+    {"name": "Medkit", "tech_level": 1, "availability": "A", "legality": "A", "cost": 10},
+    {"name": "Laser Scalpel", "tech_level": 2, "availability": "A", "legality": "B", "cost": 50},
+    {"name": "Preserving Sleeve", "tech_level": 3, "availability": "A", "legality": "A", "cost": 25},
+    {"name": "Medipack", "tech_level": 4, "availability": "C", "legality": "B", "cost": 400}
+  ]
+}

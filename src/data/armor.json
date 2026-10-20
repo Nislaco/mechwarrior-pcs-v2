@@ -1,0 +1,40 @@
+{
+  "armor_types": [
+    {"name": "Flak", "tech_level": 2, "availability": "A", "legality": "A", "patch_cost": 10, "energy": "2 pts", "ballistic": "1/2", "melee": "1/4"},
+    {"name": "Ablative", "tech_level": 3, "availability": "B", "legality": "B", "patch_cost": 20, "energy": "All", "ballistic": "None", "melee": "None"},
+    {"name": "Ablative/Flak", "tech_level": 3, "availability": "B", "legality": "B", "patch_cost": 15, "energy": "1/2", "ballistic": "1/2", "melee": "1/4"},
+    {"name": "Ballistic Plate", "tech_level": 2, "availability": "A", "legality": "B", "patch_cost": "NA", "energy": "1/4", "ballistic": "2/3", "melee": "1/2"},
+    {"name": "DEST Infiltration Suit", "tech_level": 3, "availability": "D", "legality": "B", "patch_cost": 200, "energy": "1/2", "ballistic": "1/2", "melee": "1/4", "notes": "Faceplate has Power Use of 3 pts per hour"}
+  ],
+  "flak_armor": [
+    {"name": "Flak Vest", "cost": 50, "coverage": "Torso", "damage_capacity": 25, "movement": "Full", "physical": 0, "athletic": 0},
+    {"name": "Flak Jacket", "cost": 100, "coverage": "Torso, Arms", "damage_capacity": 30, "movement": "Full", "physical": 1, "athletic": 1},
+    {"name": "Flak Pants", "cost": 75, "coverage": "Legs", "damage_capacity": 25, "movement": "Full", "physical": 0, "athletic": 1},
+    {"name": "Flak Body Suit", "cost": 150, "coverage": "Torso, Arms, Legs", "damage_capacity": 40, "movement": "Full", "physical": 1, "athletic": 2},
+    {"name": "Flak Helmet", "cost": 25, "coverage": "Head", "damage_capacity": 10, "movement": "Full", "physical": 0, "athletic": 0}
+  ],
+  "ablative_armor": [
+    {"name": "Ablative Vest", "cost": 400, "coverage": "Torso", "damage_capacity": 30, "movement": "Full", "physical": 0, "athletic": 0},
+    {"name": "Ablative Jacket", "cost": 750, "coverage": "Torso, Arms", "damage_capacity": 40, "movement": "Full", "physical": 1, "athletic": 1},
+    {"name": "Ablative Pants", "cost": 500, "coverage": "Legs", "damage_capacity": 30, "movement": "1/2", "physical": 0, "athletic": 2},
+    {"name": "Ablative Body Suit", "cost": 1000, "coverage": "Torso, Arms, Legs", "damage_capacity": 50, "movement": "1/2", "physical": 1, "athletic": 3},
+    {"name": "Ablative Helmet", "cost": 200, "coverage": "Head", "damage_capacity": 20, "movement": "Full", "physical": 0, "athletic": 0}
+  ],
+  "plate_armor": [
+    {"name": "Plate Vest", "cost": 600, "coverage": "Torso", "damage_capacity": 30, "movement": "2/3", "physical": 0, "athletic": 2},
+    {"name": "Combat Armor", "cost": 1600, "coverage": "Full", "damage_capacity": 60, "movement": "1/3", "physical": 2, "athletic": 4},
+    {"name": "Plate Helmet", "cost": 250, "coverage": "Head", "damage_capacity": 15, "movement": "Full", "physical": 0, "athletic": 0}
+  ],
+  "battle_armor": [
+    {"name": "Clan Elemental", "cost": 500000, "damage_capacity": 125, "movement": "Full, w/jump", "physical": 2, "athletic": 3, "bld": 3},
+    {"name": "Standard Inner Sphere", "cost": 400000, "damage_capacity": 110, "movement": "Full, w/jump", "physical": 2, "athletic": 4, "bld": 2},
+    {"name": "Infiltrator", "cost": 300000, "damage_capacity": 60, "movement": "Full, no jump", "physical": 1, "athletic": 4, "bld": 2},
+    {"name": "Sloth", "cost": 300000, "damage_capacity": 60, "movement": "Full, no jump", "physical": 5, "athletic": 5, "bld": 4},
+    {"name": "Marine Combat Environment Suit", "cost": 15000, "damage_capacity": 50, "movement": "1/2", "physical": 1, "athletic": 2, "bld": 0}
+  ],
+  "special_suits": [
+    {"name": "Neurohelmet", "tech_level": 2, "availability": "A", "legality": "A", "patch_cost": "NA", "energy": "1/4", "ballistic": "1/4", "melee": "1/2", "cost": 900, "coverage": "Head", "damage_capacity": 20, "movement": "Full", "physical": 0, "athletic": 2},
+    {"name": "Combat Neurohelmet", "tech_level": 3, "availability": "A", "legality": "A", "patch_cost": "NA", "energy": "1/4", "ballistic": "1/2", "melee": "1/4", "cost": 1400, "coverage": "Head", "damage_capacity": 15, "movement": "Full", "physical": 0, "athletic": 1},
+    {"name": "Clan Neurohelmet", "tech_level": 3, "availability": "C", "legality": "A", "patch_cost": "NA", "energy": "1/2", "ballistic": "1/2", "melee": "1/4", "cost": 5000, "coverage": "Head", "damage_capacity": 10, "movement": "Full", "physical": 0, "athletic": 0}
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "version": "1.0",
+  "exported": "2026-10-07T12:18:55.702212",
+  "character": {
+    "name": "Dr. Sarah Chen",
+    "race": "Human",
+    "age": 45,
+    "height": 165,
+    "weight": 65,
+    "attributes": {
+      "STRENGTH": 3,
+      "REFLEX": 4,
+      "INTUITION": 5,
+      "MEMORY": 7,
+      "LEARN": 7
+    },
+    "characteristics": {
+      "MUSCLES": 6,
+      "BODY": 7,
+      "NERVES": 9,
+      "MIND": 14
+    },
+    "saving_throws": {
+      "REFLEX": 4,
+      "INTUITION": 5,
+      "MEMORY": 7
+    },
+    "advantages": [
+      "Wealth (50,000 C-Bills) (2)",
+      "Well-Equipped (5,000 C-Bills) (2)"
+    ],
+    "skills": {
+      "First Aid": 5,
+      "Medical Treatment": 5,
+      "Knowledge (Medical)": 4,
+      "Knowledge (Military)": 3,
+      "Guns (Pistols)": 2,
+      "Leadership": 3
+    },
+    "skill_targets": {
+      "First Aid": 7,
+      "Medical Treatment": 7,
+      "Guns (Pistols)": 12
+    },
+    "equipment": [
+      {
+        "name": "Medipatch",
+        "type": "medical",
+        "cost": 10
+      },
+      {
+        "name": "Medipack",
+        "type": "medical",
+        "cost": 400
+      },
+      {
+        "name": "Medkit",
+        "type": "medical",
+        "cost": 10
+      },
+      {
+        "name": "Auto-Pistol",
+        "type": "weapon",
+        "damage": 4
+      },
+      {
+        "name": "Flak Vest",
+        "type": "armor",
+        "defense": 1
+      },
+      {
+        "name": "Laser Scalpel",
+        "type": "medical",
+        "cost": 50
+      },
+      {
+        "name": "Noteputer",
+        "type": "electronics",
+        "cost": 500
+      },
+      {
+        "name": "Well-Equipped (5,000 C-Bills)",
+        "type": "advantage",
+        "cost": 5000
+      }
+    ],
+    "credits": 50000,
+    "notes": "Field medic with extensive military experience. Can treat wounded in the field. Wealth advantage provides extra equipment."
+  }
+}

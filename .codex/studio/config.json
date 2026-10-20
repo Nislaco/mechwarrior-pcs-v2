@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "policy": {
+    "merge": "extend-only"
+  },
+  "roles": [],
+  "workflows": [],
+  "templates": []
+}

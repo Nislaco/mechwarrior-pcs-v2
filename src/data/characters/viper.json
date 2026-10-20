@@ -1,0 +1,82 @@
+{
+  "version": "1.0",
+  "exported": "2026-10-07T12:18:55.700678",
+  "character": {
+    "name": "Viper",
+    "race": "Clan",
+    "age": 32,
+    "height": 178,
+    "weight": 70,
+    "attributes": {
+      "STRENGTH": 4,
+      "REFLEX": 7,
+      "INTUITION": 6,
+      "MEMORY": 5,
+      "LEARN": 5
+    },
+    "characteristics": {
+      "MUSCLES": 8,
+      "BODY": 13,
+      "NERVES": 13,
+      "MIND": 10
+    },
+    "saving_throws": {
+      "REFLEX": 7,
+      "INTUITION": 6,
+      "MEMORY": 5
+    },
+    "advantages": [
+      "Combat Sense (2)",
+      "Enhanced Imaging (EI) Neural Implant (1)",
+      "Sixth Sense (2)"
+    ],
+    "skills": {
+      "Guns (Pistols)": 4,
+      "Unarmed Combat": 4,
+      "Stealth": 3,
+      "Infiltration": 3,
+      "Knowledge (Military)": 3,
+      "Guns (SMGs)": 3
+    },
+    "skill_targets": {
+      "Guns (Pistols)": 8,
+      "Unarmed Combat": 9,
+      "Stealth": 10,
+      "Infiltration": 10
+    },
+    "equipment": [
+      {
+        "name": "Clan Hold-Out Laser Pistol",
+        "type": "weapon",
+        "damage": 6
+      },
+      {
+        "name": "Vibroblade",
+        "type": "weapon",
+        "damage": 6
+      },
+      {
+        "name": "Ablative Vest",
+        "type": "armor",
+        "defense": 2
+      },
+      {
+        "name": "Combat Neurohelmet",
+        "type": "equipment",
+        "cost": 1400
+      },
+      {
+        "name": "Camo Suit (Sneak & ECM)",
+        "type": "special",
+        "cost": 21000
+      },
+      {
+        "name": "Noteputer",
+        "type": "electronics",
+        "cost": 500
+      }
+    ],
+    "credits": 25000,
+    "notes": "Clan infiltrator. Specializes in stealth and close combat. Light equipment package."
+  }
+}

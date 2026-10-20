@@ -1,0 +1,9 @@
+node_modules/
+dist/
+/projects/
+.hermes/
+*.tgz
+
+# Godot editor cache / import artifacts
+src/.godot/
+*.translation
