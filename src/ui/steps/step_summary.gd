@@ -84,9 +84,16 @@ func _refresh() -> void:
 		lines.append("  %-28s %d" % [skill, int(draft.purchased_skills[skill])])
 	lines.append("")
 	
-	lines.append("[b]Equipment[/b]  (credits remaining: %d)" % draft.remaining_credits())
+	lines.append("[b]Equipment[/b]")
 	for item in draft.equipment:
 		lines.append("  %-28s %d credits" % [str(item.get("name", "?")), int(item.get("cost", 0))])
+	lines.append("")
+	
+	# The character's credit pool, and the balance left after the
+	# equipment. The balance does not have to be zero: a character may
+	# finish creation without spending all of its credits.
+	lines.append("[b]Credits[/b]  %d total  -  %d spent on equipment  -  %d remaining" % [
+		draft.credits, draft.equipment_cost(), draft.remaining_credits()])
 	lines.append("")
 	
 	if not draft.service_notes.is_empty():

@@ -44,6 +44,7 @@ func _run_checks() -> void:
 	_test_skill_package()
 	_test_equipment()
 	_test_export()
+	_test_credits()
 	
 	print("--- MechWarrior PCS Wizard Verification End: %d checks, %d failures ---" % [checks, failures])
 	quit(1 if failures > 0 else 0)
@@ -420,3 +421,56 @@ func _test_export() -> void:
 			and character.get("skills", {}).size() > 0
 			and character.get("equipment", []).size() > 0,
 			str(character.keys()))
+		# The exported credits are the character's credit POOL, matching the
+		# reference schema -- not the balance left after the equipment.
+		_check("UI-AT-7 the exported credits are the character's credit pool",
+			int(character.get("credits", -1)) == wizard.draft.credits,
+			"%s vs %d" % [str(character.get("credits")), wizard.draft.credits])
+
+
+# --- Credits ---------------------------------------------------------------
+
+func _test_credits() -> void:
+	# A character may finish creation without spending all of its credits.
+	# R-S1-9.
+	wizard._show_step(4)
+	var step: Control = wizard.body.get_child(0)
+	var panel: VBoxContainer = step.get_child(0).get_child(0)
+	var list: VBoxContainer = panel.get_node("EquipmentList")
+	
+	# Buy the standard archetype, so the balance is part-spent.
+	for i in range(list.get_child_count()):
+		var row: Control = list.get_child(i)
+		if row.name == "Archetype_Standard":
+			row.get_node("Buy").pressed.emit()
+			break
+	var remaining: int = wizard.draft.remaining_credits()
+	_check("UI-AT-11 spending equipment leaves credits behind",
+		remaining > 0 and remaining < wizard.draft.credits,
+		"%d of %d" % [remaining, wizard.draft.credits])
+	
+	# The equipment step is complete even with credits left, and so is
+	# the whole character.
+	_check("UI-AT-11 the equipment step is complete with credits unspent",
+		step.is_complete(), str(remaining))
+	wizard._update_footer()
+	_check("UI-AT-11 Next is enabled with credits unspent", not wizard.next_button.disabled)
+	
+	# The sheet shows the pool, the spend and the balance.
+	wizard._show_step(5)
+	var sheet: Control = wizard.body.get_child(0)
+	var sheet_text: String = sheet.get_child(0).get_child(0).get_child(0).text
+	_check("UI-AT-11 the sheet reports the credits left",
+		sheet_text.contains("%d remaining" % remaining), sheet_text)
+	
+	# The export keeps the pool, so the balance is still derivable.
+	var exported: Dictionary = wizard.draft.to_export()
+	var character: Dictionary = exported.get("character", {})
+	_check("UI-AT-11 the export keeps the credit pool",
+		int(character.get("credits", -1)) == wizard.draft.credits,
+		str(character.get("credits")))
+	_check("UI-AT-11 the balance is derivable from the pool and the equipment",
+		int(character.get("credits", 0))
+			- int(wizard.draft.equipment_cost()) == remaining,
+		"%d - %d != %d" % [int(character.get("credits", 0)),
+			wizard.draft.equipment_cost(), remaining])

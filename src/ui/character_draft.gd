@@ -99,11 +99,26 @@ func remaining_advantage_points() -> int:
 
 
 ## Credits still available for equipment.
+##
+## A character does NOT have to spend all of its credits. What is left
+## over is still the character's. R-S1-9.
 func remaining_credits() -> int:
 	return credits - SkillRules.equipment_total_cost(equipment)
 
 
+## The cost of the equipment the character is carrying.
+func equipment_cost() -> int:
+	return SkillRules.equipment_total_cost(equipment)
+
+
 ## Build the exportable character sheet. R-S1-10.
+##
+## The exported `credits` is the character's credit POOL, not the balance
+## left after the equipment. That is what the reference schema means by
+## it: every reference sample character stores a fixed pool (5,000 /
+## 25,000 / 50,000) that does not change with what the character buys,
+## and one of them carries more equipment than its pool entirely. The
+## balance left over is derived from the pool and the equipment.
 func to_character_sheet() -> Dictionary:
 	return SkillRules.build_character_sheet(
 		name,
@@ -115,7 +130,7 @@ func to_character_sheet() -> Dictionary:
 		purchased_advantages,
 		purchased_skills,
 		equipment,
-		remaining_credits(),
+		credits,
 		skill_targets,
 		_service_note_text()
 	)

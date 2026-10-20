@@ -27,6 +27,8 @@
 - **Nothing had keyboard focus**, so Enter and Space went nowhere. Every step now grabs focus for the first *value* control — the first dropdown, spin box or text field — rather than the first focusable control, which on the priorities step is the "Flexible Priorities" checkbox. (U-S1-6)
 - **A dropdown only reports a change**, so a category the player left alone — or one set to the value it already shows — was never recorded. "Priority 0" could not be chosen, and since the assignment needs all five categories, a single untouched row left the whole character unresolved. The priorities step now records all five categories from the start.
 - **A field that holds a total must be bounded by the absolute cap, not by the headroom.** The attribute fields were capped at `racial maximum - already spent`, so a character whose racial maximum was 6 could never go past 3 once 3 points were in: the remaining 3 points were unreachable and the field simply stopped at 3. The cap is now the racial maximum in points (`maximum - modifier`, and `2 * (maximum - modifier)` for INTUITION, which costs two points per point of value), bounded further by the pool. This matches the reference implementation, which asks for an *increment* bounded the same way. (U-S1-7)
+- **A character does not have to spend all of its credits.** The credits are the character's *pool*; the balance left after the equipment is still the character's, and creation completes with it unspent. The reference's own sample characters are the evidence: each stores a fixed pool (5,000 / 25,000 / 50,000) that does not change with what the character carries, and `john_star` carries 22,810 of equipment against a pool of 5,000 — a remaining balance could not be negative. The port had been exporting the *leftover* in the `credits` field, which disagreed with every reference character; it now exports the pool, and the balance is derived (pool − equipment cost). (R-S1-9, R-S1-10)
+- **The reference's credit handling is entirely unenforced** — `credits` is never initialised in `chargen.py`'s `main()`, so the equipment step raises `UnboundLocalError`, and `purchase_equipment` never checks a budget anyway. Recorded as P-BUG-6.
 - **`SpinBox` cannot take focus** — its `focus_mode` is `FOCUS_NONE` and the player types into the line edit inside it. Focusing the SpinBox warned and did nothing, so the wizard now focuses the line edit. (U-S1-6)
 - **A plain `OptionButton` only changes value through its popup**, and a popup opened with the mouse starts its highlight on "no item", so the first arrow press lands on the first entry instead of moving one step from the current value. `src/ui/level_option.gd` makes a focused dropdown answer the arrow keys directly.
 - **The shipped sample characters are 1e-era artifacts, not 2e output.** `character_export.py` uses `STRENGTH`/`MEMORY` attributes and `MUSCLES`/`BODY`/`NERVES`/`MIND` characteristics, which contradict the 2e rules in `chargen.py`. They are kept only because the combat tracker consumes them, and are explicitly *not* used as a parity oracle.
@@ -39,8 +41,8 @@
 
 ## Verification
 
-- `godot --headless --path src -s res://scripts/verify_rules.gd` → **65 checks, 0 failures**, exit 0.
-- `godot --headless --path src -s res://scripts/verify_wizard.gd` → **64 checks, 0 failures**, exit 0.
+- `godot --headless --path src -s res://scripts/verify_rules.gd` → **67 checks, 0 failures**, exit 0.
+- `godot --headless --path src -s res://scripts/verify_wizard.gd` → **71 checks, 0 failures**, exit 0.
 - `godot --headless --path src --quit-after 90` → exit 0, 0 script errors.
 - `codex-game-studio validate` → **1216 PASS / 0 FAIL / 0 WARN**, exit 0.
 - Godot MCP bridge: connects, reports the project by name and path, live scene tree and runtime script inspection both work.
@@ -59,5 +61,5 @@
 ## Documentation Impact
 
 - Decision: updated
-- Reason: a functional change was made — the attribute fields' cap was corrected (they were bounded by the remaining headroom rather than the racial maximum, so a character could never be spent past three points in an attribute), the focus policy now reaches the SpinBox's line edit, and the new value-cap contract (U-S1-7) with its acceptance criteria (UI-AT-11..UI-AT-13) was recorded. The rules contract (R-S1-1..R-S1-10) is unchanged.
+- Reason: a functional change was made — a character may now finish creation without spending all of its credits, the exported `credits` is the character's credit pool (matching the reference schema and its sample characters) rather than the leftover balance, and the sheet and equipment step report the pool, the spend and the balance. R-S1-9 and R-S1-10 were amended and P-BUG-6 was added for the reference's uninitialised credit pool.
 - Documents: design/systems/character-creation.md, production/session-state/active.md

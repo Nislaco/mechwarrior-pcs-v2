@@ -438,6 +438,31 @@ func _test_sample_characters() -> void:
 			character.has("name") and character.has("race")
 			and character.has("attributes") and character.has("equipment"),
 			str(character.keys()))
+	
+	# The exported `credits` is the character's credit POOL, not the
+	# balance left after the equipment. The reference's own sample
+	# characters are the evidence: every one of them stores a fixed pool
+	# (5,000 / 25,000 / 50,000) that does not change with what the
+	# character carries, and john_star carries 22,810 of equipment against
+	# a pool of 5,000 -- which a remaining balance could not be.
+	var pool_evidence: Array[String] = []
+	for name in ["john_star", "viper", "dr_sarah_chen"]:
+		var path: String = "res://data/characters/%s.json" % name
+		if not FileAccess.file_exists(path):
+			continue
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+		if parsed == null:
+			continue
+		var character: Dictionary = parsed.get("character", parsed)
+		var pool: int = int(character.get("credits", 0))
+		var carried: int = SkillRules.equipment_total_cost(character.get("equipment", []))
+		pool_evidence.append("%s pool=%d carried=%d" % [name, pool, carried])
+		if carried > pool:
+			_check("S1-AT-15 %s proves the reference credits is a pool, not a balance" % name,
+				true, "")
+			break
+	_check("S1-AT-15 the reference sample characters prove credits is a credit pool",
+		not pool_evidence.is_empty(), " | ".join(pool_evidence))
 
 
 func _test_parity_corpus() -> void:
@@ -487,7 +512,7 @@ func _test_export_roundtrip() -> void:
 		{"Land Grant": 1},
 		{"Blade": 2},
 		[{"name": "Noteputer", "cost": 500}],
-		49500
+		50000
 	)
 	var exported: Dictionary = SkillRules.export_character(sheet)
 	_check("S1-AT-12 export has the version/exported/character shape",
@@ -495,7 +520,7 @@ func _test_export_roundtrip() -> void:
 	var reimported: Dictionary = SkillRules.import_character(exported)
 	_check("S1-AT-12 export round-trips",
 		reimported.get("name", "") == "Test Pilot"
-		and int(reimported.get("credits", 0)) == 49500
+		and int(reimported.get("credits", 0)) == 50000
 		and int(reimported.get("attributes", {}).get("BUILD", 0)) == 5,
 		str(reimported))
 	_check("S1-AT-12 the reimported sheet verifies against its own derived values",

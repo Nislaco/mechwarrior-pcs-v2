@@ -47,7 +47,7 @@ func _refresh() -> void:
 		child.queue_free()
 	
 	var remaining: int = draft.remaining_credits()
-	_credits_label.text = "Credits remaining: %d  (of %d)" % [remaining, draft.credits]
+	_credits_label.text = "Credits remaining: %d of %d  -  you do not have to spend them all" % [remaining, draft.credits]
 	
 	# What is already bought.
 	for item in draft.equipment:
@@ -70,7 +70,7 @@ func _refresh() -> void:
 		
 		var label := Label.new()
 		label.name = "Name"
-		label.text = "%s  (%d points, %d items)" % [variant, SkillRules.equipment_total_cost(kit), kit.size()]
+		label.text = "%s  (%d credits, %d items)" % [variant, SkillRules.equipment_total_cost(kit), kit.size()]
 		label.custom_minimum_size = Vector2(340, 0)
 		row.add_child(label)
 		

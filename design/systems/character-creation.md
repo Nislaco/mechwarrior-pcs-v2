@@ -118,8 +118,12 @@ The player has Skill Points (8–24). **No skill level may exceed the LEARN attr
 ## R-S1-9 Equipment
 Three archetypes — **Standard**, **Light**, or **Custom** — each race having its own Standard/Light lists (Clan vs Inner Sphere vs Elemental). Custom lets the player pick individual items from the equipment tables. Purchases deduct from credits (50,000 default).
 
+**A character does not have to spend all of its credits.** The credits are the character's pool; the balance left after the equipment is still the character's, and character creation completes with it unspent. The equipment step is complete whenever the character is not over budget, and nothing requires the balance to reach zero.
+
 ## R-S1-10 Character sheet & export
-The finished sheet reports: race, attributes (base and final), racial modifiers, saving throws, characteristics, advantages, skills, equipment, and remaining credits. It must export to JSON with the same shape as the reference `data/characters/*.json` (`version`, `exported`, `character`), so the existing sample characters remain loadable and the future combat tracker can import them.
+The finished sheet reports: race, attributes (base and final), racial modifiers, saving throws, characteristics, advantages, skills, equipment, and the character's **credit pool**. It must export to JSON with the same shape as the reference `data/characters/*.json` (`version`, `exported`, `character`), so the existing sample characters remain loadable and the future combat tracker can import them.
+
+**The exported `credits` is the character's credit pool, not the balance left after the equipment.** This is the reference schema's meaning, and the reference's own sample characters are the evidence: each stores a fixed pool (5,000 / 25,000 / 50,000) that does not change with what the character carries, and `john_star` carries 22,810 of equipment against a pool of 5,000 — a remaining balance could not be negative. The balance left over is derived: pool − the cost of the equipment.
 
 ---
 
@@ -176,6 +180,7 @@ The finished sheet reports: race, attributes (base and final), racial modifiers,
 | P-BUG-3 | Elemental max table reads `maximums` but the code mutates the shared dict for Exceptional Attribute, so the +1 leaks across calls | Racial tables are immutable; the Exceptional bonus is applied to a copy |
 | P-BUG-4 | No validation that Flexible Priorities levels total exactly 10 | The pool is enforced per entry, so the total is always 10 by construction |
 | P-BUG-5 | The shipped sample characters use a 1e-era schema that contradicts the 2e rules the rest of the script implements | The port implements the 2e schema. The samples are kept as legacy artifacts for the combat tracker; a 2e sample set is generated from the port and covered by the parity corpus |
+| P-BUG-6 | `credits` is never initialised in `main()`, but `credits -= equipment_cost` makes it a local, so the equipment step raises `UnboundLocalError` — and `purchase_equipment` never checks a budget anyway, so the reference's credit handling is entirely unenforced | The port gives the character an explicit credit pool, checks every purchase against the balance, and lets the character finish with credits unspent. The exported `credits` is the pool, matching the reference schema's own sample characters |
 
 ---
 
@@ -350,6 +355,7 @@ attribute and `2 * (max_value - modifier) - assigned` for INTUITION.
 | UI-AT-11 | An attribute field | put 3 points in it | the field still offers the full racial maximum, and the value it holds is not clamped away | HARNESS |
 | UI-AT-12 | A finished attribute set | read the final values | no attribute exceeds its racial maximum | HARNESS |
 | UI-AT-13 | The attributes step | open it | the keyboard lands in the first attribute's line edit, where the player can type | HARNESS |
+| UI-AT-11 | A character with credits unspent | finish the wizard | the equipment step is complete, the sheet reports the balance left, and the export keeps the credit pool so the balance is still derivable | HARNESS |
 
 ---
 
@@ -377,3 +383,4 @@ attribute and `2 * (max_value - modifier) - assigned` for INTUITION.
 - **2026-10-20** — Added the UI contract (U-S1-1..U-S1-4): the step-by-step wizard, its six steps and gates, its architecture, and the UI acceptance criteria. The rules contract (R-S1-1..R-S1-10) is unchanged.
 - **2026-10-20** — Added the layout contract (U-S1-5) and the input contract (U-S1-6), with acceptance criteria UI-AT-8..UI-AT-10. These record four defects found by playing the wizard live: a collapsed body, a nested scroll container, a missing focus owner, and a value control that never reported an unchanged value.
 - **2026-10-20** — Added the value-cap contract (U-S1-7), with acceptance criteria UI-AT-11..UI-AT-13. It records the defect where the attribute fields were bounded by the remaining headroom rather than the racial maximum, so a character could never be spent beyond three points in an attribute.
+- **2026-10-20** — R-S1-9 and R-S1-10 amended: a character may finish creation without spending all of its credits, and the exported `credits` is the character's credit **pool**, not the balance left after the equipment. The reference's own sample characters are the evidence, and P-BUG-6 records that the reference never initialises `credits` at all.
