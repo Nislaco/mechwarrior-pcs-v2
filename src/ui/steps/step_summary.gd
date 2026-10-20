@@ -1,4 +1,4 @@
-extends Control
+extends VBoxContainer
 
 ## Step 6 - Character sheet.
 ##
@@ -15,6 +15,7 @@ func build(_body: Control) -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "SheetScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
 	
@@ -26,6 +27,7 @@ func build(_body: Control) -> void:
 	
 	_sheet = RichTextLabel.new()
 	_sheet.name = "Sheet"
+	_sheet.focus_mode = Control.FOCUS_NONE
 	_sheet.bbcode_enabled = true
 	_sheet.fit_content = true
 	_sheet.size_flags_horizontal = Control.SIZE_EXPAND_FILL

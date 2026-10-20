@@ -1,4 +1,4 @@
-extends Control
+extends VBoxContainer
 
 ## Step 3 - Attributes.
 ##
@@ -21,6 +21,7 @@ func build(_body: Control) -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "AttributesScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
 	
@@ -40,6 +41,7 @@ func build(_body: Control) -> void:
 	
 	_derived = RichTextLabel.new()
 	_derived.name = "Derived"
+	_derived.focus_mode = Control.FOCUS_NONE
 	_derived.bbcode_enabled = true
 	_derived.fit_content = true
 	_derived.custom_minimum_size = Vector2(0, 130)
@@ -47,6 +49,7 @@ func build(_body: Control) -> void:
 	
 	_notes = RichTextLabel.new()
 	_notes.name = "Notes"
+	_notes.focus_mode = Control.FOCUS_NONE
 	_notes.bbcode_enabled = true
 	_notes.fit_content = true
 	_notes.add_theme_color_override("font_color", Color(0.95, 0.78, 0.45))

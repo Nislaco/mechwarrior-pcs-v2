@@ -1,4 +1,4 @@
-extends Control
+extends VBoxContainer
 
 ## Step 4 - Skills.
 ##
@@ -7,6 +7,7 @@ extends Control
 
 const Rules := preload("res://rules/mw_rules.gd")
 const SkillRules := preload("res://rules/mw_rules_skills.gd")
+const LevelOption := preload("res://ui/level_option.gd")
 
 var draft: RefCounted
 var wizard: Control
@@ -21,6 +22,7 @@ func build(_body: Control) -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "SkillsScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
 	
@@ -55,23 +57,23 @@ func build(_body: Control) -> void:
 	panel.add_child(_package_list)
 	
 	# Individual skills.
+	#
+	# The skill list is NOT wrapped in a second scroll container. A
+	# ScrollContainer nested inside another one has a minimum height of
+	# zero (it can always scroll), so the inner one collapses and takes
+	# every skill row with it. The step's own scroll carries the whole
+	# step instead.
 	var skill_title := Label.new()
 	skill_title.name = "SkillTitle"
 	skill_title.text = "Individual skills"
 	skill_title.add_theme_font_size_override("font_size", 16)
 	panel.add_child(skill_title)
 	
-	var skill_scroll := ScrollContainer.new()
-	skill_scroll.name = "SkillScroll"
-	skill_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	skill_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	panel.add_child(skill_scroll)
-	
 	_skill_list = VBoxContainer.new()
 	_skill_list.name = "SkillList"
 	_skill_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_skill_list.add_theme_constant_override("separation", 2)
-	skill_scroll.add_child(_skill_list)
+	panel.add_child(_skill_list)
 	
 	_refresh()
 
@@ -187,7 +189,7 @@ func _refresh_skills(_remaining: int) -> void:
 		row.add_child(label)
 		
 		var owned: int = int(draft.purchased_skills.get(skill, 0))
-		var option := OptionButton.new()
+		var option := LevelOption.new()
 		option.name = "Level"
 		option.custom_minimum_size = Vector2(140, 0)
 		option.add_item("0", 0)
@@ -225,6 +227,15 @@ func _skill_names() -> Array:
 func _on_skill_level(index: int, skill: String) -> void:
 	# OptionButton index maps to the level value stored as the item id.
 	var level: int = index
+	var previous: int = int(draft.purchased_skills.get(skill, 0))
+	if level == previous:
+		return
+	# The pool must not be overspent. Refuse the change and put the
+	# control back where it was, rather than letting the player wedge
+	# themselves with an un-affordable character.
+	var cost: int = level - previous
+	if cost > 0 and cost > draft.remaining_skill_points():
+		return
 	draft.purchased_skills[skill] = level
 	draft.recompute_attributes()
 	_refresh()

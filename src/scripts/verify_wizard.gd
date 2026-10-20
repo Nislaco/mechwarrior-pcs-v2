@@ -19,6 +19,12 @@ func _initialize() -> void:
 	print("--- MechWarrior PCS Wizard Verification Start ---")
 	wizard = Wizard.new()
 	wizard.name = "Wizard"
+	# Give the wizard a real size, the way the boot scene does. Without
+	# this the wizard is 0x0, the root falls back to its minimum size and
+	# the body gets zero height -- so every layout check below would be
+	# measuring a wizard that was never laid out at all.
+	wizard.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	wizard.size = Vector2(1280, 800)
 	# Add to the root window so the wizard's _ready() runs and the shell
 	# is built before the checks run.
 	get_root().add_child(wizard)
@@ -30,7 +36,8 @@ func _initialize() -> void:
 
 func _run_checks() -> void:
 	_test_shell()
-	_test_priorities_gate()
+	await _test_layout()
+	await _test_priorities_gate()
 	_test_advantage_purchase()
 	_test_attribute_allocation()
 	_test_skill_package()
@@ -61,12 +68,100 @@ func _test_shell() -> void:
 	_check("UI-AT-1 six steps are registered", Wizard.STEPS.size() == 6)
 
 
+# --- Layout ---------------------------------------------------------------
+
+func _test_layout() -> void:
+	# The body must have real height, and so must the step inside it.
+	#
+	# A step is a plain Control it has a zero minimum size and does not
+	# lay out its own children, so the body gave it zero height and the
+	# whole step fell out of the visible and clickable area. The controls
+	# were still in the tree; they were simply not on screen.
+	for index in range(Wizard.STEPS.size()):
+		wizard._show_step(index)
+		# Container layout is deferred to the end of the frame, so the step
+		# has no size until the next frame is processed.
+		await process_frame
+		await process_frame
+		var step: Control = wizard.body.get_child(0)
+		_check("UI-AT-8 step %d has a non-zero height" % index, step.size.y > 0.0,
+			"height %f" % step.size.y)
+		_check("UI-AT-8 step %d has a non-zero width" % index, step.size.x > 0.0,
+			"width %f" % step.size.x)
+		
+		# Every interactive control in the step must be on screen: it must
+		# have a real size, and no ancestor may be collapsed to zero.
+		var controls: Array[Control] = []
+		_collect_interactive(step, controls)
+		var broken: Array[String] = []
+		for control in controls:
+			if _is_broken(control):
+				broken.append("%s@%s" % [control.name, str(control.get_global_rect())])
+		_check("UI-AT-8 every control in step %d is on screen" % index, broken.is_empty(),
+			"%d broken: %s" % [broken.size(), ", ".join(broken.slice(0, 4))])
+		
+		# The keyboard needs somewhere to go.
+		var focus: Control = get_root().gui_get_focus_owner()
+		_check("UI-AT-8 step %d gives the keyboard a focus owner" % index, focus != null,
+			"focus owner is null")
+	
+	wizard._show_step(0)
+
+
+func _collect_controls(node: Node, out: Array[Control]) -> void:
+	for child in node.get_children():
+		if child is Control:
+			out.append(child)
+		_collect_controls(child, out)
+
+
+## The controls a player can actually operate: the things that must be
+## on screen and clickable.
+func _collect_interactive(node: Node, out: Array[Control]) -> void:
+	for child in node.get_children():
+		if child is Control:
+			var control: Control = child
+			if control is Button or control is OptionButton or control is SpinBox \
+					or control is CheckBox or control is LineEdit:
+				out.append(control)
+		_collect_interactive(child, out)
+
+
+## Is this control unusable because it has no size, or because one of its
+## ancestors is collapsed to zero and clips it away?
+func _is_broken(control: Control) -> bool:
+	var rect: Rect2 = control.get_global_rect()
+	if rect.size.x <= 0.0 or rect.size.y <= 0.0:
+		return true
+	# Walk the ancestors: if any of them has a zero-sized rect, the control
+	# is clipped out of existence even though it is "visible".
+	var node: Node = control.get_parent()
+	while node is Control:
+		var ancestor: Control = node
+		if ancestor.size.x <= 0.0 or ancestor.size.y <= 0.0:
+			return true
+		node = ancestor.get_parent()
+	return false
+
+
 # --- Step 1: priorities ---------------------------------------------------
 
 func _test_priorities_gate() -> void:
 	# Next stays disabled until a valid assignment exists.
 	wizard._show_step(0)
 	_check("UI-AT-2 Next is disabled with no priorities", wizard.next_button.disabled)
+	
+	# Every category must be recorded, including one the player never
+	# touches. A dropdown only reports a *change*, so a category left at
+	# its default of 0 would otherwise never be recorded -- and the
+	# assignment needs all five.
+	wizard._show_step(0)
+	await process_frame
+	_check("UI-AT-2 every priority category is recorded",
+		wizard.draft.priorities.size() == 5, str(wizard.draft.priorities.keys()))
+	_check("UI-AT-2 an untouched category is recorded at 0",
+		int(wizard.draft.priorities.get("Vehicle Class", -1)) == 0,
+		str(wizard.draft.priorities))
 	
 	# A duplicate level is not accepted.
 	_set_priorities({"Race": 2, "Attributes": 2, "Skills": 1, "Advantages": 0, "Vehicle Class": 3})
@@ -85,6 +180,41 @@ func _test_priorities_gate() -> void:
 		and d.skill_points == 20 and d.advantage_points == 1
 		and d.vehicle_class == "None",
 		"%s / %d / %d / %d / %s" % [d.race, d.attribute_points, d.skill_points, d.advantage_points, d.vehicle_class])
+	
+	# A focused dropdown must answer the arrow keys directly, so a player
+	# can change a value without opening the popup.
+	wizard._show_step(0)
+	await process_frame
+	var step: Control = wizard.body.get_child(0)
+	var panel: VBoxContainer = step.get_child(0).get_child(0)
+	var race_option: OptionButton = panel.get_node("Row_Race").get_child(1)
+	race_option.grab_focus()
+	race_option.select(0)
+	await process_frame
+	_send_arrow(race_option, "ui_down")
+	_check("UI-AT-2 the arrow keys change a focused dropdown",
+		race_option.selected == 1, str(race_option.selected))
+	_check("UI-AT-2 the arrow key change reaches the draft",
+		int(wizard.draft.priorities.get("Race", -1)) == 1,
+		str(wizard.draft.priorities))
+	_send_arrow(race_option, "ui_down")
+	_send_arrow(race_option, "ui_down")
+	_check("UI-AT-2 the arrow keys stop at the top of the range",
+		race_option.selected == 3, str(race_option.selected))
+	_send_arrow(race_option, "ui_up")
+	_check("UI-AT-2 the arrow keys go back down", race_option.selected == 2,
+		str(race_option.selected))
+	
+	# Set priorities again for the tests that follow.
+	_set_priorities({"Race": 2, "Attributes": 4, "Skills": 3, "Advantages": 1, "Vehicle Class": 0})
+
+
+## Deliver an action to a control the way the GUI would.
+func _send_arrow(control: Control, action: String) -> void:
+	var event := InputEventAction.new()
+	event.action = action
+	event.pressed = true
+	control._gui_input(event)
 
 
 func _set_priorities(priorities: Dictionary) -> void:
@@ -185,7 +315,7 @@ func _test_skill_package() -> void:
 		"%s != %s" % [wizard.draft.selected_package, bought])
 	
 	# The skill list is present and capped at LEARN.
-	var skill_list: VBoxContainer = panel.get_child(panel.get_child_count() - 1).get_child(0)
+	var skill_list: VBoxContainer = panel.get_node("SkillList")
 	_check("UI-AT-5 the individual skill list is populated", skill_list.get_child_count() > 40,
 		str(skill_list.get_child_count()))
 

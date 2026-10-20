@@ -1,4 +1,4 @@
-extends Control
+extends VBoxContainer
 
 ## Step 5 - Equipment.
 ##
@@ -18,6 +18,7 @@ func build(_body: Control) -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "EquipmentScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
 	

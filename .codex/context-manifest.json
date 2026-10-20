@@ -38,7 +38,7 @@
       "status": "selected",
       "statusReason": "selected within budget",
       "safety": "safe",
-      "chars": 197
+      "chars": 714
     },
     {
       "sourcePath": "docs/market-overview.md",
@@ -91,6 +91,6 @@
     "maxChars": 48000,
     "maxEntryChars": 16000,
     "usedFiles": 9,
-    "usedChars": 12309
+    "usedChars": 12826
   }
 }

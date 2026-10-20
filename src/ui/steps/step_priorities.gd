@@ -1,4 +1,4 @@
-extends Control
+extends VBoxContainer
 
 ## Step 1 - Priorities.
 ##
@@ -7,6 +7,7 @@ extends Control
 ## Points (the optional flexible rule). R-S1-1 / R-S1-2.
 
 const Rules := preload("res://rules/mw_rules.gd")
+const LevelOption := preload("res://ui/level_option.gd")
 
 var draft: RefCounted
 var wizard: Control
@@ -17,9 +18,22 @@ var _summary: RichTextLabel
 
 
 func build(_body: Control) -> void:
+	# Every category is recorded from the start, at its default level of 0.
+	#
+	# A dropdown only reports a change, so a category the player leaves
+	# alone would never be recorded at all -- and "Priority 0" could never
+	# be chosen, because that is what the dropdown already shows. Since
+	# the assignment needs all five categories, a single untouched row
+	# would leave the whole character unresolved.
+	for category in Rules.CATEGORIES:
+		if not draft.priorities.has(category):
+			draft.priorities[category] = 0
+	draft.apply_priorities()
+	
 	var scroll := ScrollContainer.new()
 	scroll.name = "PrioritiesScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
 	
@@ -47,6 +61,7 @@ func build(_body: Control) -> void:
 	# Live summary of what the priorities grant.
 	_summary = RichTextLabel.new()
 	_summary.name = "PrioritySummary"
+	_summary.focus_mode = Control.FOCUS_NONE
 	_summary.bbcode_enabled = true
 	_summary.fit_content = true
 	_summary.custom_minimum_size = Vector2(0, 150)
@@ -66,7 +81,7 @@ func _make_category_row(category: String) -> Control:
 	label.custom_minimum_size = Vector2(160, 0)
 	row.add_child(label)
 	
-	var option := OptionButton.new()
+	var option := LevelOption.new()
 	option.name = "Option"
 	option.custom_minimum_size = Vector2(300, 0)
 	option.item_selected.connect(_on_level_changed.bind(category))
@@ -83,7 +98,9 @@ func _refresh_category_options(category: String) -> void:
 	var values: Dictionary = Rules.PRIORITY_VALUES[category]
 	for level in range(5):
 		option.add_item("Priority %d  ->  %s" % [level, str(values[level])])
-	option.select(0)
+	# Show what the draft already holds, so rebuilding the options (for
+	# example when the rule mode is toggled) does not lose the choice.
+	option.select(clampi(int(draft.priorities.get(category, 0)), 0, 4))
 
 
 func _on_mode_toggled(_pressed: bool) -> void:

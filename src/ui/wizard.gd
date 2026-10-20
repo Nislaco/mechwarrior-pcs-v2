@@ -152,6 +152,13 @@ func _show_step(index: int) -> void:
 	step.name = "Step_%d" % step_index
 	step.draft = draft
 	step.wizard = self
+	# The step must fill the body. A step is a VBoxContainer, so it lays
+	# out its own children; without the expand flags the body would give
+	# it only its minimum size and the whole step would collapse to zero
+	# height, taking every control in it out of the visible and clickable
+	# area.
+	step.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	step.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(step)
 	if step.has_method("build"):
 		step.build(body)
@@ -164,6 +171,54 @@ func _show_step(index: int) -> void:
 	next_button.text = "Next" if step_index < STEPS.size() - 1 else "Finish"
 	
 	_update_footer()
+	_focus_first_control()
+
+
+## Give the keyboard a starting point.
+##
+## Without this the viewport has no focus owner at all, so Enter and Space
+## go nowhere: the player has to click a control before the keyboard can
+## reach it.
+##
+## The first *value* control (a dropdown, a spin box, a text field) takes
+## focus, not the first focusable control. On the priorities step that
+## would be the "Flexible Priorities" checkbox, and a player pressing
+## Enter to open the first dropdown would instead silently switch the
+## priority mode.
+func _focus_first_control() -> void:
+	var target: Control = _find_value_control(body)
+	if target == null:
+		target = _find_focusable(body)
+	if target == null:
+		target = next_button
+	if target != null:
+		target.grab_focus()
+
+
+## The first control a player types a value into.
+func _find_value_control(node: Node) -> Control:
+	for child in node.get_children():
+		if child is Control:
+			var control: Control = child
+			if control is OptionButton or control is SpinBox or control is LineEdit:
+				return control
+			var found: Control = _find_value_control(control)
+			if found != null:
+				return found
+	return null
+
+
+## The first focusable control at or below `node`, depth first.
+func _find_focusable(node: Node) -> Control:
+	for child in node.get_children():
+		if child is Control:
+			var control: Control = child
+			if control.focus_mode != Control.FOCUS_NONE and not control.disabled:
+				return control
+			var found: Control = _find_focusable(control)
+			if found != null:
+				return found
+	return null
 
 
 func _on_next() -> void:

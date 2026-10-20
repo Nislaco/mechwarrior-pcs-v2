@@ -1,4 +1,4 @@
-extends Control
+extends VBoxContainer
 
 ## Step 2 - Advantages.
 ##
@@ -18,6 +18,7 @@ var _family_label: Label
 func build(_body: Control) -> void:
 	var panel := VBoxContainer.new()
 	panel.name = "AdvantagesPanel"
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	panel.add_theme_constant_override("separation", 6)
 	add_child(panel)
@@ -37,6 +38,7 @@ func build(_body: Control) -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "AdvantagesScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	panel.add_child(scroll)
 	

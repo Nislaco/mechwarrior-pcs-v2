@@ -245,6 +245,10 @@ long scrollable page and over a two-pane layout with a live summary.
   scene file for a flow this dynamic is the most likely place for a
   mistake to hide, and the whole tree remains inspectable live through the
   Godot MCP bridge.
+- A step is a **container** (U-S1-5) and every step gives the keyboard a
+  **focus owner** (U-S1-6). Both are contracts, not implementation
+  details: violating either produces controls that exist, are correct,
+  and are unreachable by the player.
 
 ## U-S1-4 UI acceptance criteria
 
@@ -262,6 +266,61 @@ long scrollable page and over a two-pane layout with a live summary.
 clamps its value to `max_value`. A maximum computed from the *remaining
 headroom* rather than from the points already allocated silently destroys
 the player's allocation. The harness asserts the value survives.
+
+## U-S1-5 Layout contract
+
+A step is a **container**, not a bare `Control`.
+
+- A plain `Control` has a zero minimum size and does not lay out its own
+  children. A step built that way is given zero height by the body, and
+  every control inside it is clipped out of existence: still in the tree,
+  but neither visible nor clickable.
+- The wizard sets `SIZE_EXPAND_FILL` on the step it creates.
+- A step's own top-level child fills the step's width.
+- **A step has exactly one scroll container.** A `ScrollContainer` nested
+  inside another one has a minimum height of zero — it can always scroll —
+  so the inner one collapses and takes its whole content with it. Where
+  a second region is needed, it is a plain container inside the step's
+  one scroll.
+
+**Why this is a contract and not an implementation detail:** every one of
+these rules was violated at least once, and every violation produced the
+same symptom — the controls existed and were correct, but the player
+could not see or reach them. UI-AT-8 measures the layout rather than
+trusting it.
+
+## U-S1-6 Input contract
+
+- **Every step gives the keyboard a focus owner.** Without one, Enter and
+  Space go nowhere: the player must click a control before the keyboard
+  can reach it.
+- **Focus lands on the first *value* control** — a dropdown, a spin box, a
+  text field — not merely the first focusable control. On the priorities
+  step the first focusable control is the "Flexible Priorities" checkbox,
+  and a player pressing Enter to open the first dropdown would instead
+  silently switch the priority mode.
+- **A focused dropdown answers the arrow keys directly.** A plain
+  `OptionButton` only changes its value through its popup, which splits
+  the keyboard path into three steps and behaves inconsistently: a popup
+  opened with the mouse starts its highlight on "no item", so the first
+  arrow press lands on the first entry rather than moving one step from
+  the current value. `src/ui/level_option.gd` fixes this.
+- **A value control reports its value even when it is unchanged.** A
+  dropdown only emits a change, so a category the player leaves alone —
+  or one set to the value it already shows — would never be recorded.
+  The priorities step therefore records all five categories from the
+  start, at their default of 0. Without this, "Priority 0" could never
+  be chosen, and since the assignment needs all five categories, a
+  single untouched row left the whole character unresolved.
+- A read-only `RichTextLabel` must not take focus (`FOCUS_NONE`).
+
+## U-S1-7 UI acceptance criteria (layout and input)
+
+| ID | Given | When | Then | Method |
+|----|-------|------|------|--------|
+| UI-AT-8 | A wizard laid out at 1280x800 | open each of the six steps | the step and its scroll have a real size, every interactive control is on screen and not clipped by a collapsed ancestor, and the viewport has a focus owner | HARNESS |
+| UI-AT-9 | A focused priority dropdown | press Down and Up | the value changes without opening the popup, and the change reaches the draft | HARNESS |
+| UI-AT-10 | The priorities step | open it | all five categories are recorded, including one left at its default of 0 | HARNESS |
 
 ---
 
@@ -287,3 +346,4 @@ the player's allocation. The harness asserts the value survives.
 # Changelog
 
 - **2026-10-20** — Added the UI contract (U-S1-1..U-S1-4): the step-by-step wizard, its six steps and gates, its architecture, and the UI acceptance criteria. The rules contract (R-S1-1..R-S1-10) is unchanged.
+- **2026-10-20** — Added the layout contract (U-S1-5) and the input contract (U-S1-6), with acceptance criteria UI-AT-8..UI-AT-10. These record four defects found by playing the wizard live: a collapsed body, a nested scroll container, a missing focus owner, and a value control that never reported an unchanged value.
