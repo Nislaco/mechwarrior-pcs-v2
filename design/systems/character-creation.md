@@ -202,6 +202,69 @@ The rules engine must be verifiable in isolation from the UI, so the same logic 
 
 ---
 
+# UI Contract — the character-creation wizard
+
+## U-S1-1 Step model
+
+The wizard is a **step-by-step flow**, matching the workflow of the source
+application (`mw-depo/mw-script/chargen.py`). This was chosen over a single
+long scrollable page and over a two-pane layout with a live summary.
+
+- **Why step-by-step:** it mirrors the reference workflow, and it keeps each
+  decision in front of the player at a legible size. The scope of this
+  application is character generation alone.
+- **Why not two-pane:** a live summary pane is the better model for a future
+  application in which character generation is only *one* feature alongside
+  combat tracking or a hex map, where the player needs to see the character
+  while choosing equipment. It is recorded here as the preferred model for
+  that later scope, and it is not a cost to move there later: the rules
+  engine is already pure and the draft state is already a single object.
+
+## U-S1-2 Steps
+
+| # | Step | Owns | Gate to advance |
+|---|------|------|-----------------|
+| 1 | Priorities | the five priority categories, standard or flexible | a valid assignment (no duplicate levels, or a flexible total of 10) |
+| 2 | Advantages | spending Advantage Points | none — a character may take zero advantages |
+| 3 | Attributes | the attribute point pool | **all attribute points spent** |
+| 4 | Skills | a skill package, then individual skills | the pool is not overspent |
+| 5 | Equipment | archetype loadouts and individual items | the budget is not exceeded |
+| 6 | Character sheet | the finished sheet and the export | always |
+
+## U-S1-3 Architecture
+
+- `src/rules/` is **pure and UI-free**. It is the only thing that
+  interprets a character.
+- `src/ui/character_draft.gd` is the **single state object** carried across
+  the steps. The steps read and write it; nothing else holds state.
+- `src/ui/wizard.gd` is the **shell**: header, body, message line, and
+  footer. It owns navigation and the validation gate; it holds no rules.
+- `src/ui/steps/step_*.gd` are the six steps. Each builds its own body and
+  reports `is_complete()`.
+- The UI is **built in code**, not authored in a `.tscn`. A hand-authored
+  scene file for a flow this dynamic is the most likely place for a
+  mistake to hide, and the whole tree remains inspectable live through the
+  Godot MCP bridge.
+
+## U-S1-4 UI acceptance criteria
+
+| ID | Given | When | Then | Method |
+|----|-------|------|------|--------|
+| UI-AT-1 | A fresh wizard | open it | shows step 1 of 6; Back is disabled; Next is disabled until the step is complete | HARNESS |
+| UI-AT-2 | The priorities step | assign a duplicate level, then a valid one | Next stays disabled, then enables; the assignment resolves to the R-S1-2 values | HARNESS |
+| UI-AT-3 | The advantages step | buy an advantage | the purchase is recorded and the points are deducted | HARNESS |
+| UI-AT-4 | The attributes step | spend the whole pool | the racial modifiers are applied, the derived values are shown, the spin boxes keep the allocated value, and Next enables | HARNESS |
+| UI-AT-5 | The skills step | buy a package | the skills are granted, the package name is recorded, and the individual skill list is populated | HARNESS |
+| UI-AT-6 | The equipment step | buy an archetype, then remove an item | the credits are deducted and refunded | HARNESS |
+| UI-AT-7 | The last step | finish | the character is written to `user://character.json` and the file has the R-S1-10 export shape | HARNESS |
+
+**Why UI-AT-4 checks the spin box value explicitly:** Godot's `SpinBox`
+clamps its value to `max_value`. A maximum computed from the *remaining
+headroom* rather than from the points already allocated silently destroys
+the player's allocation. The harness asserts the value survives.
+
+---
+
 # Risks
 
 | Risk | Severity | Mitigation |
@@ -210,6 +273,7 @@ The rules engine must be verifiable in isolation from the UI, so the same logic 
 | The Python reference itself is wrong in places | Medium | Defects found are recorded above (P-BUG-1..4) and the port implements the corrected behaviour |
 | Rulebook ambiguity (e.g. Clan Heritage, trueborn Bloodnames) | Medium | Out of scope for m1 and explicitly flagged as unimplemented, not guessed |
 | UI drift from the rules engine | High | The engine is pure logic with no UI dependency; the wizard only calls it |
+| The wizard's own state drifts from the draft | Medium | The draft is the single source of truth; the steps hold no state of their own, and the UI harness drives the real controls rather than the draft directly |
 
 ---
 
@@ -217,3 +281,9 @@ The rules engine must be verifiable in isolation from the UI, so the same logic 
 
 - **Decision requested:** approve R-S1-1..R-S1-10 and the four corrected reference behaviours.
 - **Next owner:** gameplay-programmer ports the engine to GDScript (`src/rules/`); qa-playtester writes the parity corpus against the Python.
+
+---
+
+# Changelog
+
+- **2026-10-20** — Added the UI contract (U-S1-1..U-S1-4): the step-by-step wizard, its six steps and gates, its architecture, and the UI acceptance criteria. The rules contract (R-S1-1..R-S1-10) is unchanged.

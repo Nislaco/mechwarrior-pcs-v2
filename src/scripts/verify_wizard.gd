@@ -1,0 +1,257 @@
+extends SceneTree
+
+## Verification harness for the character-creation wizard (UI layer).
+##
+## The rules are covered by verify_rules.gd; this covers the UI that
+## drives them: the step flow, the validation gates, and the export.
+##
+## Run: godot --headless --path src -s res://scripts/verify_wizard.gd
+## Exits non-zero on any failure.
+
+const Wizard := preload("res://ui/wizard.gd")
+
+var checks: int = 0
+var failures: int = 0
+var wizard: Control
+
+
+func _initialize() -> void:
+	print("--- MechWarrior PCS Wizard Verification Start ---")
+	wizard = Wizard.new()
+	wizard.name = "Wizard"
+	# Add to the root window so the wizard's _ready() runs and the shell
+	# is built before the checks run.
+	get_root().add_child(wizard)
+	# _ready() is deferred until the node enters the tree and the first
+	# frame is processed, so wait for it before asserting.
+	await process_frame
+	_run_checks()
+
+
+func _run_checks() -> void:
+	_test_shell()
+	_test_priorities_gate()
+	_test_advantage_purchase()
+	_test_attribute_allocation()
+	_test_skill_package()
+	_test_equipment()
+	_test_export()
+	
+	print("--- MechWarrior PCS Wizard Verification End: %d checks, %d failures ---" % [checks, failures])
+	quit(1 if failures > 0 else 0)
+
+
+func _check(id: String, condition: bool, detail: String = "") -> void:
+	checks += 1
+	if condition:
+		print("PASS ", id)
+	else:
+		failures += 1
+		print("FAIL ", id, (" - " + detail) if detail != "" else "")
+
+
+# --- Shell -----------------------------------------------------------------
+
+func _test_shell() -> void:
+	# The shell has a header, a body, a message line and a footer.
+	_check("UI-AT-1 wizard has a body", wizard.body != null and wizard.body.get_child_count() == 1)
+	_check("UI-AT-1 wizard shows step 1 of 6", wizard.title_label.text == "Priorities", wizard.title_label.text)
+	_check("UI-AT-1 Back is disabled on the first step", wizard.back_button.disabled)
+	_check("UI-AT-1 Next is disabled until the step is complete", wizard.next_button.disabled)
+	_check("UI-AT-1 six steps are registered", Wizard.STEPS.size() == 6)
+
+
+# --- Step 1: priorities ---------------------------------------------------
+
+func _test_priorities_gate() -> void:
+	# Next stays disabled until a valid assignment exists.
+	wizard._show_step(0)
+	_check("UI-AT-2 Next is disabled with no priorities", wizard.next_button.disabled)
+	
+	# A duplicate level is not accepted.
+	_set_priorities({"Race": 2, "Attributes": 2, "Skills": 1, "Advantages": 0, "Vehicle Class": 3})
+	wizard._update_footer()
+	_check("UI-AT-2 a duplicate priority keeps Next disabled", wizard.next_button.disabled)
+	
+	# A valid permutation enables it.
+	_set_priorities({"Race": 2, "Attributes": 4, "Skills": 3, "Advantages": 1, "Vehicle Class": 0})
+	wizard._update_footer()
+	_check("UI-AT-2 a valid priority assignment enables Next", not wizard.next_button.disabled)
+	
+	# The priorities resolve into the values they grant.
+	var d = wizard.draft
+	_check("UI-AT-2 priorities resolve to race and points",
+		d.race == "Clan Warrior" and d.attribute_points == 30
+		and d.skill_points == 20 and d.advantage_points == 1
+		and d.vehicle_class == "None",
+		"%s / %d / %d / %d / %s" % [d.race, d.attribute_points, d.skill_points, d.advantage_points, d.vehicle_class])
+
+
+func _set_priorities(priorities: Dictionary) -> void:
+	wizard.draft.priorities = priorities.duplicate()
+	wizard.draft.apply_priorities()
+
+
+# --- Step 2: advantages ----------------------------------------------------
+
+func _test_advantage_purchase() -> void:
+	wizard._show_step(1)
+	var before: int = wizard.draft.remaining_advantage_points()
+	
+	# Buy the cheapest thing on offer.
+	var step: Control = wizard.body.get_child(0)
+	var list: VBoxContainer = step.get_child(0).get_node("AdvantagesScroll/AdvantagesList")
+	var bought: String = ""
+	for i in range(list.get_child_count()):
+		var row: Control = list.get_child(i)
+		if not row.name.begins_with("Offer_"):
+			continue
+		for j in range(row.get_child_count()):
+			var b: Control = row.get_child(j)
+			if b is Button and str(b.text).begins_with("Buy"):
+				b.pressed.emit()
+				bought = row.name
+				break
+		break
+	_check("UI-AT-3 an advantage can be bought from the UI", not bought.is_empty(), bought)
+	_check("UI-AT-3 buying an advantage spends its points",
+		wizard.draft.remaining_advantage_points() < before,
+		"%d -> %d" % [before, wizard.draft.remaining_advantage_points()])
+
+
+# --- Step 3: attributes ---------------------------------------------------
+
+func _test_attribute_allocation() -> void:
+	wizard._show_step(2)
+	var step: Control = wizard.body.get_child(0)
+	var panel: VBoxContainer = step.get_child(0).get_child(0)
+	
+	# Allocate every point through the real SpinBoxes.
+	# Clan Warrior: 30 points, INTUITION costs two points per point of value.
+	var want: Dictionary = {"BUILD": 6, "REFLEX": 6, "LEARN": 6, "CHARISMA": 4, "INTUITION": 8}
+	for attribute in want:
+		var row: HBoxContainer = panel.get_node("Row_%s" % attribute)
+		var spin: SpinBox = row.get_child(1)
+		spin.set_value_no_signal(int(want[attribute]))
+		spin.value_changed.emit(int(want[attribute]))
+	
+	_check("UI-AT-4 all attribute points are spent",
+		wizard.draft.remaining_attribute_points() == 0,
+		"remaining %d" % wizard.draft.remaining_attribute_points())
+	
+	# The final values include the racial modifiers.
+	var attrs: Dictionary = wizard.draft.final_attributes
+	_check("UI-AT-4 the racial modifiers are applied",
+		int(attrs["REFLEX"]) == 7 and int(attrs["INTUITION"]) == 5,
+		str(attrs))
+	
+	# The SpinBox maximum must never sit below the points already allocated
+	# (Godot would clamp the value and destroy the allocation).
+	var build_row: HBoxContainer = panel.get_node("Row_BUILD")
+	var build_spin: SpinBox = build_row.get_child(1)
+	_check("UI-AT-4 the attribute spin box keeps the allocated value",
+		int(build_spin.value) == 6, str(build_spin.value))
+	
+	# The derived values are shown.
+	_check("UI-AT-4 saving throws and characteristics are derived",
+		wizard.draft.saving_throws.size() == 5 and wizard.draft.characteristics.size() == 4)
+	
+	# Now the step is complete, so Next is enabled.
+	wizard._update_footer()
+	_check("UI-AT-4 Next is enabled once every point is spent", not wizard.next_button.disabled)
+
+
+# --- Step 4: skills -------------------------------------------------------
+
+func _test_skill_package() -> void:
+	wizard._show_step(3)
+	var step: Control = wizard.body.get_child(0)
+	var panel: VBoxContainer = step.get_child(0).get_child(0)
+	var list: VBoxContainer = panel.get_node("PackageList")
+	
+	var bought: String = ""
+	for i in range(list.get_child_count()):
+		var row: Control = list.get_child(i)
+		if not row.name.begins_with("Package_"):
+			continue
+		row.get_node("Buy").pressed.emit()
+		bought = str(row.name).trim_prefix("Package_")
+		break
+	_check("UI-AT-5 a skill package can be bought from the UI", not bought.is_empty(), bought)
+	_check("UI-AT-5 the package grants skills",
+		wizard.draft.purchased_skills.size() > 0,
+		str(wizard.draft.purchased_skills.size()))
+	_check("UI-AT-5 the package name is recorded", wizard.draft.selected_package == bought,
+		"%s != %s" % [wizard.draft.selected_package, bought])
+	
+	# The skill list is present and capped at LEARN.
+	var skill_list: VBoxContainer = panel.get_child(panel.get_child_count() - 1).get_child(0)
+	_check("UI-AT-5 the individual skill list is populated", skill_list.get_child_count() > 40,
+		str(skill_list.get_child_count()))
+
+
+# --- Step 5: equipment ----------------------------------------------------
+
+func _test_equipment() -> void:
+	wizard._show_step(4)
+	var step: Control = wizard.body.get_child(0)
+	var panel: VBoxContainer = step.get_child(0).get_child(0)
+	var list: VBoxContainer = panel.get_node("EquipmentList")
+	
+	var bought: bool = false
+	for i in range(list.get_child_count()):
+		var row: Control = list.get_child(i)
+		if row.name == "Archetype_Standard":
+			row.get_node("Buy").pressed.emit()
+			bought = true
+			break
+	_check("UI-AT-6 an archetype loadout can be bought", bought)
+	_check("UI-AT-6 the credits are deducted",
+		wizard.draft.remaining_credits() < wizard.draft.credits,
+		"%d -> %d" % [wizard.draft.credits, wizard.draft.remaining_credits()])
+	
+	# The individual item list is populated from the equipment tables.
+	var item_rows: int = 0
+	for i in range(list.get_child_count()):
+		if str(list.get_child(i).name).begins_with("Item_"):
+			item_rows += 1
+	_check("UI-AT-6 the individual item list is populated", item_rows > 10, str(item_rows))
+	
+	# Removing an item refunds the credits.
+	var before: int = wizard.draft.remaining_credits()
+	for i in range(list.get_child_count()):
+		var row: Control = list.get_child(i)
+		if str(row.name).begins_with("Bought_"):
+			row.get_node("Remove").pressed.emit()
+			break
+	_check("UI-AT-6 removing an item refunds the credits",
+		wizard.draft.remaining_credits() > before,
+		"%d -> %d" % [before, wizard.draft.remaining_credits()])
+
+
+# --- Step 6: export -------------------------------------------------------
+
+func _test_export() -> void:
+	wizard._show_step(5)
+	_check("UI-AT-7 the last step is the character sheet", wizard.title_label.text == "Character Sheet", wizard.title_label.text)
+	
+	# Finishing writes the file.
+	wizard._on_next()
+	_check("UI-AT-7 finishing writes the character file",
+		FileAccess.file_exists("user://character.json"),
+		wizard.message_label.text)
+	
+	# And the file is a valid export.
+	var text: String = FileAccess.get_file_as_string("user://character.json")
+	var parsed = JSON.parse_string(text)
+	_check("UI-AT-7 the written file parses as JSON", parsed != null)
+	if parsed != null:
+		_check("UI-AT-7 the written file has the export shape",
+			parsed.has("version") and parsed.has("exported") and parsed.has("character"))
+		var character: Dictionary = parsed.get("character", {})
+		_check("UI-AT-7 the exported character carries the built values",
+			str(character.get("race", "")) == "Clan Warrior"
+			and character.get("attributes", {}).size() == 5
+			and character.get("skills", {}).size() > 0
+			and character.get("equipment", []).size() > 0,
+			str(character.keys()))

@@ -56,7 +56,7 @@
       "status": "selected",
       "statusReason": "selected within budget",
       "safety": "safe",
-      "chars": 62
+      "chars": 900
     },
     {
       "sourcePath": "docs/engine-reference/godot/VERSION.md",
@@ -91,6 +91,6 @@
     "maxChars": 48000,
     "maxEntryChars": 16000,
     "usedFiles": 9,
-    "usedChars": 11471
+    "usedChars": 12309
   }
 }

@@ -55,7 +55,9 @@ static func max_skill_level(learn: int) -> int:
 
 
 ## Can this skill be raised to this level? R-S1-8.
-static func skill_level_allowed(skill: String, level: int, learn: int, purchased: Dictionary) -> Dictionary:
+## `skill` and `purchased` are accepted for call-site symmetry with the
+## rest of the skill API; the cap depends only on LEARN.
+static func skill_level_allowed(_skill: String, level: int, learn: int, _purchased: Dictionary) -> Dictionary:
 	if level < 0:
 		return {"ok": false, "error": "Skill level cannot be negative."}
 	if level > max_skill_level(learn):
@@ -317,7 +319,6 @@ static func import_character(data: Dictionary) -> Dictionary:
 ## Used to prove the port agrees with the reference data. R-S1-10.
 static func verify_character(character: Dictionary) -> Array[String]:
 	var notes: Array[String] = []
-	var race: String = str(character.get("race", ""))
 	var attributes: Dictionary = character.get("attributes", {})
 	if not attributes.is_empty():
 		var expected_throws: Dictionary = Rules.calculate_saving_throws(attributes)

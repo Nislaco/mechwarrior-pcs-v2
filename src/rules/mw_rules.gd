@@ -258,6 +258,9 @@ static func advantage_family(name: String) -> String:
 ## INTUITION is special: value = floor(points / 2). R-S1-5.
 static func attribute_points_to_value(attribute: String, points: int) -> int:
 	if attribute == "INTUITION":
+		# Integer division is deliberate: INTUITION costs two points per point
+		# of value, so the remainder is discarded.
+		@warning_ignore("integer_division")
 		return points / 2
 	return points
 
