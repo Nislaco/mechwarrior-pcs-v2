@@ -26,6 +26,8 @@
 - **A `ScrollContainer` nested inside another one has a minimum height of zero** — it can always scroll — so the inner one collapses and takes its content with it. The skills step had one; a step now has exactly one scroll container.
 - **Nothing had keyboard focus**, so Enter and Space went nowhere. Every step now grabs focus for the first *value* control — the first dropdown, spin box or text field — rather than the first focusable control, which on the priorities step is the "Flexible Priorities" checkbox. (U-S1-6)
 - **A dropdown only reports a change**, so a category the player left alone — or one set to the value it already shows — was never recorded. "Priority 0" could not be chosen, and since the assignment needs all five categories, a single untouched row left the whole character unresolved. The priorities step now records all five categories from the start.
+- **A field that holds a total must be bounded by the absolute cap, not by the headroom.** The attribute fields were capped at `racial maximum - already spent`, so a character whose racial maximum was 6 could never go past 3 once 3 points were in: the remaining 3 points were unreachable and the field simply stopped at 3. The cap is now the racial maximum in points (`maximum - modifier`, and `2 * (maximum - modifier)` for INTUITION, which costs two points per point of value), bounded further by the pool. This matches the reference implementation, which asks for an *increment* bounded the same way. (U-S1-7)
+- **`SpinBox` cannot take focus** — its `focus_mode` is `FOCUS_NONE` and the player types into the line edit inside it. Focusing the SpinBox warned and did nothing, so the wizard now focuses the line edit. (U-S1-6)
 - **A plain `OptionButton` only changes value through its popup**, and a popup opened with the mouse starts its highlight on "no item", so the first arrow press lands on the first entry instead of moving one step from the current value. `src/ui/level_option.gd` makes a focused dropdown answer the arrow keys directly.
 - **The shipped sample characters are 1e-era artifacts, not 2e output.** `character_export.py` uses `STRENGTH`/`MEMORY` attributes and `MUSCLES`/`BODY`/`NERVES`/`MIND` characteristics, which contradict the 2e rules in `chargen.py`. They are kept only because the combat tracker consumes them, and are explicitly *not* used as a parity oracle.
 - **The parity oracle is now generated from the reference itself.** `tools/gen_parity_corpus.py` imports `chargen.py` and emits `src/data/parity_corpus.json` (40 attribute sets with the reference's own saving throws and characteristics). The GDScript engine re-derives them and the harness diffs — a true cross-check of the port, not a self-consistency check. **Zero mismatches.**
@@ -38,11 +40,11 @@
 ## Verification
 
 - `godot --headless --path src -s res://scripts/verify_rules.gd` → **65 checks, 0 failures**, exit 0.
-- `godot --headless --path src -s res://scripts/verify_wizard.gd` → **59 checks, 0 failures**, exit 0.
+- `godot --headless --path src -s res://scripts/verify_wizard.gd` → **64 checks, 0 failures**, exit 0.
 - `godot --headless --path src --quit-after 90` → exit 0, 0 script errors.
 - `codex-game-studio validate` → **1216 PASS / 0 FAIL / 0 WARN**, exit 0.
 - Godot MCP bridge: connects, reports the project by name and path, live scene tree and runtime script inspection both work.
-- **Live play-through, driven through the MCP with real input events** (not by calling the handlers): the layout measures `body 1280x664 / step 1280x664 / scroll 1280x664`; a real mouse click opens the Race dropdown and a real click on the popup item selects it (`selected=2`, `priorities={ "Race": 2 }`); the arrow keys step a focused dropdown; all five priorities end up recorded; the Next button is enabled and a real click advances the wizard to the Advantages step; the character resolves to `race=Clan Warrior attrPoints=30 skillPoints=20 advPoints=1 vehicle=None`. No script warnings or errors remain in `res://rules/`, `res://ui/` or `res://scenes/`.
+- **Live play-through, driven through the MCP with real input events** (not by calling the handlers): the layout measures `body 1280x664 / step 1280x664 / scroll 1280x664`; a real mouse click opens the Race dropdown and a real click on the popup item selects it (`selected=2`, `priorities={ "Race": 2 }`); the arrow keys step a focused dropdown; all five priorities end up recorded; the Next button is enabled and a real click advances the wizard to the Advantages step; the character resolves to `race=Clan Warrior attrPoints=30 skillPoints=20 advPoints=1 vehicle=None`. Typing `6` into the BUILD attribute field commits `spent={ "BUILD": 6 }` with 12 points left, and typing `99` clamps to the racial maximum of 6. No script warnings or errors remain in `res://rules/`, `res://ui/` or `res://scenes/`.
 
 ## Remaining Risks
 
@@ -57,5 +59,5 @@
 ## Documentation Impact
 
 - Decision: updated
-- Reason: a functional change was made — the wizard's layout and input behaviour were fixed, a new `LevelOption` control was added, and the new layout and input contracts (U-S1-5, U-S1-6) with their acceptance criteria (UI-AT-8..UI-AT-10) were recorded. The rules contract (R-S1-1..R-S1-10) is unchanged.
+- Reason: a functional change was made — the attribute fields' cap was corrected (they were bounded by the remaining headroom rather than the racial maximum, so a character could never be spent past three points in an attribute), the focus policy now reaches the SpinBox's line edit, and the new value-cap contract (U-S1-7) with its acceptance criteria (UI-AT-11..UI-AT-13) was recorded. The rules contract (R-S1-1..R-S1-10) is unchanged.
 - Documents: design/systems/character-creation.md, production/session-state/active.md

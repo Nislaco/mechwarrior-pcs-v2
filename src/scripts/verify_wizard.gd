@@ -9,6 +9,7 @@ extends SceneTree
 ## Exits non-zero on any failure.
 
 const Wizard := preload("res://ui/wizard.gd")
+const Rules := preload("res://rules/mw_rules.gd")
 
 var checks: int = 0
 var failures: int = 0
@@ -39,7 +40,7 @@ func _run_checks() -> void:
 	await _test_layout()
 	await _test_priorities_gate()
 	_test_advantage_purchase()
-	_test_attribute_allocation()
+	await _test_attribute_allocation()
 	_test_skill_package()
 	_test_equipment()
 	_test_export()
@@ -253,8 +254,27 @@ func _test_advantage_purchase() -> void:
 
 func _test_attribute_allocation() -> void:
 	wizard._show_step(2)
+	await process_frame
 	var step: Control = wizard.body.get_child(0)
 	var panel: VBoxContainer = step.get_child(0).get_child(0)
+	
+	# The spin box holds the TOTAL number of points in the attribute, so
+	# its maximum must be the racial cap -- not the remaining headroom.
+	#
+	# With the headroom as the cap, a character whose racial maximum is 6
+	# could never go past 3 once 3 points were in, and the rest of the
+	# attribute was unreachable.
+	var build_row: HBoxContainer = panel.get_node("Row_BUILD")
+	var build_spin: SpinBox = build_row.get_child(1)
+	_check("UI-AT-4 an empty attribute offers the full racial maximum",
+		int(build_spin.max_value) == 6, str(build_spin.max_value))
+	build_spin.set_value_no_signal(3)
+	build_spin.value_changed.emit(3)
+	await process_frame
+	_check("UI-AT-4 a partly-filled attribute still offers the full racial maximum",
+		int(build_spin.max_value) == 6, str(build_spin.max_value))
+	_check("UI-AT-4 the partly-filled attribute keeps its value",
+		int(build_spin.value) == 3, str(build_spin.value))
 	
 	# Allocate every point through the real SpinBoxes.
 	# Clan Warrior: 30 points, INTUITION costs two points per point of value.
@@ -277,10 +297,25 @@ func _test_attribute_allocation() -> void:
 	
 	# The SpinBox maximum must never sit below the points already allocated
 	# (Godot would clamp the value and destroy the allocation).
-	var build_row: HBoxContainer = panel.get_node("Row_BUILD")
-	var build_spin: SpinBox = build_row.get_child(1)
 	_check("UI-AT-4 the attribute spin box keeps the allocated value",
 		int(build_spin.value) == 6, str(build_spin.value))
+	
+	# The final values must not exceed the racial maximums. R-S1-5.
+	var maximums: Dictionary = Rules.race_maximums(wizard.draft.race)
+	var over: Array[String] = []
+	for attribute in attrs:
+		if int(attrs[attribute]) > int(maximums.get(attribute, 0)):
+			over.append("%s %d > %d" % [attribute, int(attrs[attribute]), int(maximums.get(attribute, 0))])
+	_check("UI-AT-4 no attribute exceeds its racial maximum", over.is_empty(),
+		", ".join(over))
+	
+	# The keyboard must land somewhere the player can type. A SpinBox
+	# cannot take focus itself, so the line edit inside it is focused.
+	var focus: Control = get_root().gui_get_focus_owner()
+	var focus_is_the_build_field: bool = focus != null and focus is LineEdit \
+		and focus.get_parent() == build_spin
+	_check("UI-AT-4 the keyboard lands in the first attribute field",
+		focus_is_the_build_field, str(focus))
 	
 	# The derived values are shown.
 	_check("UI-AT-4 saving throws and characteristics are derived",

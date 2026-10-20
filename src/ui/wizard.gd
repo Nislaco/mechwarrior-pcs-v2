@@ -191,8 +191,17 @@ func _focus_first_control() -> void:
 		target = _find_focusable(body)
 	if target == null:
 		target = next_button
-	if target != null:
-		target.grab_focus()
+	if target == null:
+		return
+	# A SpinBox cannot take focus itself -- its focus_mode is NONE and
+	# the player types into the line edit inside it. Focusing the SpinBox
+	# warns and does nothing, so focus the line edit.
+	if target is SpinBox:
+		var edit: LineEdit = target.get_line_edit()
+		if edit != null:
+			edit.grab_focus()
+			return
+	target.grab_focus()
 
 
 ## The first control a player types a value into.

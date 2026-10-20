@@ -127,12 +127,18 @@ func _refresh() -> void:
 		var row: Dictionary = _rows[attribute]
 		var spin: SpinBox = row.spin
 		var spent: int = int(draft.attribute_spent.get(attribute, 0))
-		# The headroom is how many MORE points may go in. The spin's maximum
-		# must never sit below the points already allocated, or Godot clamps
-		# the value and silently destroys the player's allocation.
-		var headroom: int = Rules.attribute_points_headroom(attribute, spent, effective_max, modifiers)
+		# The spin box holds the TOTAL number of points in the attribute,
+		# so its maximum is the absolute cap for that attribute -- not the
+		# headroom, which is how many MORE points may still be added.
+		#
+		# Using the headroom here caps the box at (cap - already spent):
+		# a character with a racial maximum of 6 could never go past 3
+		# once 3 points were in, and the remaining 3 were unreachable.
+		var cap: int = Rules.attribute_points_headroom(attribute, 0, effective_max, modifiers)
+		# The pool bounds it: the points already spent on the OTHER
+		# attributes are not available here.
 		var pool: int = remaining + spent
-		spin.max_value = maxi(spent, mini(headroom, pool))
+		spin.max_value = maxi(spent, mini(cap, pool))
 		spin.set_value_no_signal(spent)
 		var value: int = Rules.attribute_final_value(attribute, spent, modifiers)
 		row.points.text = "%d points" % spent

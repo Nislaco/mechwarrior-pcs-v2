@@ -313,14 +313,43 @@ trusting it.
   be chosen, and since the assignment needs all five categories, a
   single untouched row left the whole character unresolved.
 - A read-only `RichTextLabel` must not take focus (`FOCUS_NONE`).
+- **A `SpinBox` cannot take focus itself** — its `focus_mode` is `FOCUS_NONE`
+  and the player types into the line edit inside it. Focusing the SpinBox
+  warns and does nothing, so the line edit is focused instead.
 
-## U-S1-7 UI acceptance criteria (layout and input)
+## U-S1-7 A value control's maximum is its absolute cap
+
+A control that holds a **total** must be bounded by the absolute cap for
+that value, not by the headroom — the amount that may still be *added*.
+
+The attribute fields are the case in point. The field shows the total
+points in the attribute, and its maximum is the racial cap in points:
+`maximum - modifier` for a normal attribute and `2 * (maximum - modifier)`
+for INTUITION, which costs two points per point of value. Bounding the
+field by the headroom instead caps it at `cap - already spent`: a
+character whose racial maximum was 6 could never go past 3 once 3 points
+were in, and the remaining 3 points were unreachable. The player sees a
+field that stops at 3 and no way to spend the rest of the character.
+
+The pool still bounds the field: the points already spent on the *other*
+attributes are not available here. The two bounds are independent — the
+racial cap limits one attribute, the pool limits the character — and the
+field's maximum is the smaller of the two.
+
+This matches the reference implementation, which asks for an *increment*
+(`max_points_to_assign`) bounded by `max_value - modifier` for a normal
+attribute and `2 * (max_value - modifier) - assigned` for INTUITION.
+
+## U-S1-8 UI acceptance criteria (layout and input)
 
 | ID | Given | When | Then | Method |
 |----|-------|------|------|--------|
 | UI-AT-8 | A wizard laid out at 1280x800 | open each of the six steps | the step and its scroll have a real size, every interactive control is on screen and not clipped by a collapsed ancestor, and the viewport has a focus owner | HARNESS |
 | UI-AT-9 | A focused priority dropdown | press Down and Up | the value changes without opening the popup, and the change reaches the draft | HARNESS |
 | UI-AT-10 | The priorities step | open it | all five categories are recorded, including one left at its default of 0 | HARNESS |
+| UI-AT-11 | An attribute field | put 3 points in it | the field still offers the full racial maximum, and the value it holds is not clamped away | HARNESS |
+| UI-AT-12 | A finished attribute set | read the final values | no attribute exceeds its racial maximum | HARNESS |
+| UI-AT-13 | The attributes step | open it | the keyboard lands in the first attribute's line edit, where the player can type | HARNESS |
 
 ---
 
@@ -347,3 +376,4 @@ trusting it.
 
 - **2026-10-20** — Added the UI contract (U-S1-1..U-S1-4): the step-by-step wizard, its six steps and gates, its architecture, and the UI acceptance criteria. The rules contract (R-S1-1..R-S1-10) is unchanged.
 - **2026-10-20** — Added the layout contract (U-S1-5) and the input contract (U-S1-6), with acceptance criteria UI-AT-8..UI-AT-10. These record four defects found by playing the wizard live: a collapsed body, a nested scroll container, a missing focus owner, and a value control that never reported an unchanged value.
+- **2026-10-20** — Added the value-cap contract (U-S1-7), with acceptance criteria UI-AT-11..UI-AT-13. It records the defect where the attribute fields were bounded by the remaining headroom rather than the racial maximum, so a character could never be spent beyond three points in an attribute.
