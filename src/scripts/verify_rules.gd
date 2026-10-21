@@ -33,6 +33,7 @@ func _init() -> void:
 	_test_equipment()
 	_test_sample_characters()
 	_test_parity_corpus()
+	_test_rulebook_corpus()
 	_test_export_roundtrip()
 	
 	print("--- MechWarrior PCS Rules Verification End: %d checks, %d failures ---" % [checks, failures])
@@ -499,6 +500,139 @@ func _test_parity_corpus() -> void:
 		throw_mismatches == 0, "%d mismatches" % throw_mismatches)
 	_check("S1-AT-14 characteristics match the Python reference on all cases",
 		characteristic_mismatches == 0, "%d mismatches" % characteristic_mismatches)
+
+
+func _test_rulebook_corpus() -> void:
+	# S1-AT-16: the engine agrees with the RULEBOOK.
+	#
+	# The parity corpus checks the port against the Python reference. That
+	# is a check of the port against the reference -- not a check that
+	# either of them agrees with the book. This corpus is parsed straight
+	# out of the rulebook's own tables (tools/gen_rulebook_corpus.py), so
+	# the rulebook is an oracle in its own right, independent of the
+	# reference the port was written from.
+	var path: String = "res://data/rulebook_corpus.json"
+	if not FileAccess.file_exists(path):
+		_check("S1-AT-16 the rulebook corpus is present", false, path)
+		return
+	var corpus = JSON.parse_string(FileAccess.get_file_as_string(path))
+	_check("S1-AT-16 the rulebook corpus parses", corpus != null)
+	if corpus == null:
+		return
+	
+	# 1. The Master Character Table: what each priority level grants.
+	var expected_priorities: Dictionary = corpus.get("priority_values", {})
+	var priority_errors: Array[String] = []
+	for category in expected_priorities:
+		var engine_values: Dictionary = Rules.PRIORITY_VALUES.get(category, {})
+		for level in expected_priorities[category]:
+			var want = expected_priorities[category][level]
+			var got = engine_values.get(int(level), "<missing>")
+			# JSON numbers come back as floats, so compare numerically
+			# rather than as strings.
+			if want is float or want is int:
+				if int(got) != int(want):
+					priority_errors.append("%s priority %s: rulebook %s, engine %s" % [
+						category, str(level), str(want), str(got)])
+			elif str(want) != str(got):
+				priority_errors.append("%s priority %s: rulebook %s, engine %s" % [
+					category, str(level), str(want), str(got)])
+	_check("S1-AT-16 the priority table matches the rulebook's Master Character Table",
+		priority_errors.is_empty(), "; ".join(priority_errors))
+	
+	# 2. The Racial Maximum Table.
+	var maximum_errors: Array[String] = []
+	for race in corpus.get("racial_maximums", {}):
+		var want: Dictionary = corpus["racial_maximums"][race]
+		var got: Dictionary = Rules.race_maximums(race)
+		if got.is_empty():
+			maximum_errors.append("%s: no maximums in the engine" % race)
+			continue
+		for attribute in want:
+			if int(got.get(attribute, -1)) != int(want[attribute]):
+				maximum_errors.append("%s %s: rulebook %d, engine %d" % [
+					race, attribute, int(want[attribute]), int(got.get(attribute, -1))])
+	_check("S1-AT-16 the racial maximums match the rulebook's Racial Maximum Table",
+		maximum_errors.is_empty(), "; ".join(maximum_errors))
+	
+	# 3. The racial modifiers.
+	var modifier_errors: Array[String] = []
+	for race in corpus.get("racial_modifiers", {}):
+		var want: Dictionary = corpus["racial_modifiers"][race]
+		var got: Dictionary = Rules.race_modifiers(race)
+		for attribute in want:
+			if int(got.get(attribute, 999)) != int(want[attribute]):
+				modifier_errors.append("%s %s: rulebook %d, engine %d" % [
+					race, attribute, int(want[attribute]), int(got.get(attribute, 999))])
+	_check("S1-AT-16 the racial modifiers match the rulebook",
+		modifier_errors.is_empty(), "; ".join(modifier_errors))
+	
+	# 4. The formulas: saving throws and characteristics, recomputed from
+	#    the rulebook's own expression rather than from the engine's.
+	var formulas: Dictionary = corpus.get("formulas", {})
+	var saving: Dictionary = formulas.get("saving_throw", {})
+	var saving_base: int = int(saving.get("base", 18))
+	var saving_multiplier: int = int(saving.get("multiplier", 2))
+	var characteristics: Dictionary = formulas.get("characteristics", {})
+	var characteristic_base: int = int(characteristics.get("base", 18))
+	var pairs: Dictionary = characteristics.get("pairs", {})
+	
+	var formula_errors: Array[String] = []
+	var cases: Array = [
+		{"BUILD": 5, "REFLEX": 4, "LEARN": 3, "CHARISMA": 4, "INTUITION": 5},
+		{"BUILD": 0, "REFLEX": 0, "LEARN": 0, "CHARISMA": 0, "INTUITION": 0},
+		{"BUILD": 6, "REFLEX": 7, "LEARN": 6, "CHARISMA": 6, "INTUITION": 7},
+		{"BUILD": 8, "REFLEX": 8, "LEARN": 6, "CHARISMA": 5, "INTUITION": 6},
+		{"BUILD": 3, "REFLEX": 3, "LEARN": 3, "CHARISMA": 3, "INTUITION": 3},
+	]
+	for attrs in cases:
+		for attribute in attrs:
+			var want_throw: int = saving_base - (saving_multiplier * int(attrs[attribute]))
+			var got_throw: int = int(Rules.calculate_saving_throws(attrs).get(attribute, -999))
+			if got_throw != want_throw:
+				formula_errors.append("%s throw: rulebook %d, engine %d" % [
+					attribute, want_throw, got_throw])
+		for characteristic in pairs:
+			var pair: Array = pairs[characteristic]
+			var want_value: int = characteristic_base - (int(attrs[pair[0]]) + int(attrs[pair[1]]))
+			var got_value: int = int(Rules.calculate_characteristics(attrs).get(characteristic, -999))
+			if got_value != want_value:
+				formula_errors.append("%s: rulebook %d, engine %d" % [
+					characteristic, want_value, got_value])
+	_check("S1-AT-16 the saving throws and characteristics match the rulebook's formulas",
+		formula_errors.is_empty(), "; ".join(formula_errors.slice(0, 4)))
+	
+	# 5. The rulebook's own worked example, recomputed by hand from its
+	#    own text: "Garret has a Build 5... 18 - 10 = 8" and "an ITN 5
+	#    and a CHA 4... The result is 9".
+	var example_errors: Array[String] = []
+	for example in corpus.get("worked_examples", []):
+		var attrs: Dictionary = example.get("attributes", {})
+		var throws: Dictionary = Rules.calculate_saving_throws(attrs)
+		for attribute in example.get("saving_throws", {}):
+			if int(throws.get(attribute, -999)) != int(example["saving_throws"][attribute]):
+				example_errors.append("%s throw: rulebook %d, engine %d" % [
+					attribute, int(example["saving_throws"][attribute]),
+					int(throws.get(attribute, -999))])
+		var chars: Dictionary = Rules.calculate_characteristics(attrs)
+		for characteristic in example.get("characteristics", {}):
+			if int(chars.get(characteristic, -999)) != int(example["characteristics"][characteristic]):
+				example_errors.append("%s: rulebook %d, engine %d" % [
+					characteristic, int(example["characteristics"][characteristic]),
+					int(chars.get(characteristic, -999))])
+	_check("S1-AT-16 the rulebook's own worked example reproduces",
+		example_errors.is_empty(), "; ".join(example_errors))
+	
+	# 6. Intuition costs two points per point of value: "INT... has a
+	#    final value equal to half (round down) the Attribute Points".
+	var per_value: int = int(formulas.get("intuition_points_per_value", 2))
+	var intuition_ok: bool = true
+	for points in range(0, 15):
+		var expected_value: int = int(floor(float(points) / float(per_value)))
+		if Rules.attribute_points_to_value("INTUITION", points) != expected_value:
+			intuition_ok = false
+	_check("S1-AT-16 Intuition is half the points assigned, rounded down",
+		intuition_ok)
 
 
 func _test_export_roundtrip() -> void:

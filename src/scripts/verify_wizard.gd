@@ -45,6 +45,8 @@ func _run_checks() -> void:
 	_test_equipment()
 	_test_export()
 	_test_credits()
+	# Before the finished-state test, which starts a fresh character.
+	_test_export_against_rulebook()
 	await _test_finished_state()
 	
 	print("--- MechWarrior PCS Wizard Verification End: %d checks, %d failures ---" % [checks, failures])
@@ -544,3 +546,84 @@ func _test_credits() -> void:
 			- int(wizard.draft.equipment_cost()) == remaining,
 		"%d - %d != %d" % [int(character.get("credits", 0)),
 			wizard.draft.equipment_cost(), remaining])
+
+
+# --- The exported character against the rulebook -------------------------
+
+func _test_export_against_rulebook() -> void:
+	# Every value in a finished character, checked against the rulebook
+	# itself rather than against the engine that produced it.
+	#
+	# The rulebook corpus is parsed out of the book's own tables and
+	# formulas (tools/gen_rulebook_corpus.py), so this is an independent
+	# check of the exported sheet, not a restatement of the engine.
+	var path: String = "res://data/rulebook_corpus.json"
+	if not FileAccess.file_exists(path):
+		_check("UI-AT-13 the rulebook corpus is present", false, path)
+		return
+	var corpus = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if corpus == null:
+		_check("UI-AT-13 the rulebook corpus parses", false)
+		return
+	var formulas: Dictionary = corpus.get("formulas", {})
+	var saving: Dictionary = formulas.get("saving_throw", {})
+	var saving_base: int = int(saving.get("base", 18))
+	var saving_multiplier: int = int(saving.get("multiplier", 2))
+	var characteristic_base: int = int(formulas.get("characteristics", {}).get("base", 18))
+	var pairs: Dictionary = formulas.get("characteristics", {}).get("pairs", {})
+	
+	var exported: Dictionary = wizard.draft.to_export()
+	var character: Dictionary = exported.get("character", {})
+	var attributes: Dictionary = character.get("attributes", {})
+	
+	# 1. The attributes are the points assigned, plus the racial
+	#    modifier, with Intuition at half its points.
+	var race: String = str(character.get("race", ""))
+	var modifiers: Dictionary = corpus.get("racial_modifiers", {}).get(race, {})
+	var spent: Dictionary = character.get("attribute_points_spent", {})
+	var attribute_errors: Array[String] = []
+	for attribute in attributes:
+		var points: int = int(spent.get(attribute, 0))
+		var modifier: int = int(modifiers.get(attribute, 0))
+		var want: int = points + modifier
+		if attribute == "INTUITION":
+			want = int(floor(float(points) / 2.0)) + modifier
+		if int(attributes[attribute]) != want:
+			attribute_errors.append("%s: rulebook %d, sheet %d" % [
+				attribute, want, int(attributes[attribute])])
+	_check("UI-AT-13 the sheet's attributes follow the rulebook's allocation rules",
+		attribute_errors.is_empty(), "; ".join(attribute_errors))
+	
+	# 2. The saving throws.
+	var throws: Dictionary = character.get("saving_throws", {})
+	var throw_errors: Array[String] = []
+	for attribute in attributes:
+		var want: int = saving_base - (saving_multiplier * int(attributes[attribute]))
+		if int(throws.get(attribute, -999)) != want:
+			throw_errors.append("%s: rulebook %d, sheet %d" % [
+				attribute, want, int(throws.get(attribute, -999))])
+	_check("UI-AT-13 the sheet's saving throws follow the rulebook's formula",
+		throw_errors.is_empty(), "; ".join(throw_errors))
+	
+	# 3. The characteristics.
+	var characteristics: Dictionary = character.get("characteristics", {})
+	var characteristic_errors: Array[String] = []
+	for characteristic in pairs:
+		var pair: Array = pairs[characteristic]
+		var want: int = characteristic_base - (int(attributes.get(pair[0], 0)) + int(attributes.get(pair[1], 0)))
+		if int(characteristics.get(characteristic, -999)) != want:
+			characteristic_errors.append("%s: rulebook %d, sheet %d" % [
+				characteristic, want, int(characteristics.get(characteristic, -999))])
+	_check("UI-AT-13 the sheet's characteristics follow the rulebook's formulas",
+		characteristic_errors.is_empty(), "; ".join(characteristic_errors))
+	
+	# 4. The racial modifiers recorded on the sheet.
+	var sheet_modifiers: Dictionary = character.get("racial_modifiers", {})
+	var modifier_errors: Array[String] = []
+	for attribute in modifiers:
+		if int(sheet_modifiers.get(attribute, 999)) != int(modifiers[attribute]):
+			modifier_errors.append("%s: rulebook %d, sheet %d" % [
+				attribute, int(modifiers[attribute]),
+				int(sheet_modifiers.get(attribute, 999))])
+	_check("UI-AT-13 the sheet's racial modifiers match the rulebook",
+		modifier_errors.is_empty(), "; ".join(modifier_errors))

@@ -1,0 +1,145 @@
+{
+  "formulas": {
+    "characteristics": {
+      "base": 18,
+      "pairs": {
+        "Athletic": [
+          "BUILD",
+          "REFLEX"
+        ],
+        "Mental": [
+          "INTUITION",
+          "LEARN"
+        ],
+        "Physical": [
+          "REFLEX",
+          "INTUITION"
+        ],
+        "Social": [
+          "INTUITION",
+          "CHARISMA"
+        ]
+      }
+    },
+    "intuition_points_per_value": 2,
+    "saving_throw": {
+      "base": 18,
+      "multiplier": 2
+    }
+  },
+  "priority_values": {
+    "Advantages": {
+      "0": 0,
+      "1": 1,
+      "2": 2,
+      "3": 3,
+      "4": 4
+    },
+    "Attributes": {
+      "0": 18,
+      "1": 21,
+      "2": 24,
+      "3": 27,
+      "4": 30
+    },
+    "Race": {
+      "0": "Human",
+      "1": "Human",
+      "2": "Clan Warrior",
+      "3": "Clan Pilot",
+      "4": "Elemental"
+    },
+    "Skills": {
+      "0": 8,
+      "1": 12,
+      "2": 16,
+      "3": 20,
+      "4": 24
+    },
+    "Vehicle Class": {
+      "0": "None",
+      "1": "Light",
+      "2": "Medium",
+      "3": "Heavy",
+      "4": "Assault"
+    }
+  },
+  "racial_maximums": {
+    "Clan Pilot": {
+      "BUILD": 5,
+      "CHARISMA": 6,
+      "INTUITION": 7,
+      "LEARN": 6,
+      "REFLEX": 8
+    },
+    "Clan Warrior": {
+      "BUILD": 6,
+      "CHARISMA": 6,
+      "INTUITION": 7,
+      "LEARN": 6,
+      "REFLEX": 7
+    },
+    "Elemental": {
+      "BUILD": 8,
+      "CHARISMA": 5,
+      "INTUITION": 6,
+      "LEARN": 6,
+      "REFLEX": 7
+    },
+    "Human": {
+      "BUILD": 6,
+      "CHARISMA": 6,
+      "INTUITION": 6,
+      "LEARN": 6,
+      "REFLEX": 6
+    }
+  },
+  "racial_modifiers": {
+    "Clan Pilot": {
+      "BUILD": -1,
+      "CHARISMA": 0,
+      "INTUITION": 1,
+      "LEARN": 0,
+      "REFLEX": 2
+    },
+    "Clan Warrior": {
+      "BUILD": 0,
+      "CHARISMA": 0,
+      "INTUITION": 1,
+      "LEARN": 0,
+      "REFLEX": 1
+    },
+    "Elemental": {
+      "BUILD": 2,
+      "CHARISMA": -1,
+      "INTUITION": 0,
+      "LEARN": 0,
+      "REFLEX": 1
+    },
+    "Human": {
+      "BUILD": 0,
+      "CHARISMA": 0,
+      "INTUITION": 0,
+      "LEARN": 0,
+      "REFLEX": 0
+    }
+  },
+  "source": "MechWarrior 2nd Edition rulebook (BattleTech 1641), OCR in mw-doc/mw2",
+  "worked_examples": [
+    {
+      "attributes": {
+        "BUILD": 5,
+        "CHARISMA": 4,
+        "INTUITION": 5,
+        "LEARN": 3,
+        "REFLEX": 4
+      },
+      "characteristics": {
+        "Social": 9
+      },
+      "saving_throws": {
+        "BUILD": 8
+      }
+    }
+  ]
+}

@@ -24,6 +24,46 @@ The rules are a **port** of the working Python reference at `mw-depo/mw-script/c
 
 # Source Evidence
 
+The port has **two independent oracles**, and that matters: checking the
+GDScript engine against the Python reference proves the *port* matches the
+*reference*, but not that either of them matches the **book**.
+
+| Oracle | What it proves | How |
+|--------|----------------|-----|
+| The Python reference (`mw-depo/mw-script/chargen.py`) | The port is faithful to the reference | 40-case parity corpus generated from the reference's own functions; the engine re-derives and the harness diffs (S1-AT-14) |
+| **The rulebook** (`mw-doc/mw2/...1641 - MechWarrior 2nd Edition RPG.pdf`) | The engine is faithful to the **primary source** | `tools/gen_rulebook_corpus.py` parses the book's own tables and formulas out of the OCR'd pages into `src/data/rulebook_corpus.json`; the engine and a finished exported character are diffed against it (S1-AT-16, UI-AT-13) |
+
+The two are independent: the Python was hand-written from the book, the
+corpus is parsed from the book.
+
+**Rulebook pages used:** Master Character Table (p. 14), Assign Attribute
+Points (p. 15), Racial Modifiers / Minimum Values / Racial Maximum Table
+(p. 18), Attribute Saving Rolls and Characteristics (p. 19).
+
+**The rulebook's own words,** for the rules the engine implements:
+
+> "assign a Priority Level from 0 to 4 to each of the five categories…
+> All five Priority Levels (0, 1, 2, 3, and 4) must be assigned." (p. 14)
+
+> "BLD, REF, LRN and CHA each have a final value equal to the number of
+> attribute points assigned to them… INT, however, has a final value equal
+> to half (round down) the Attribute Points assigned to it." (p. 15)
+
+> "no Inner Sphere or Secondary Clan MechWarrior may have Reflexes or
+> Intuition lower than 4. Primary Clan MechWarriors must have a Reflexes or
+> Intuition no lower than 5." (p. 18)
+
+> "To determine the saving roll for each of the attributes, subtract double
+> the value of that attribute from 18." (p. 19)
+
+> "Athletic: 18 - (Build + Reflexes) / Physical: 18 - (Reflexes +
+> Intuition) / Mental: 18 - (Intuition + Learn) / Social: 18 - (Intuition
+> + Charisma)" (p. 19)
+
+> "At the gamemaster's option, the player may assign Priorities from a pool
+> of 10 Character Points to the five categories in any way he desires."
+> (p. 15)
+
 | Source | Used for |
 |--------|----------|
 | `mw-depo/mw-script/chargen.py` (1,863 lines) | The behavioural reference for every rule below |
@@ -204,6 +244,8 @@ The rules engine must be verifiable in isolation from the UI, so the same logic 
 | S1-AT-12 | A finished character | export | JSON matches the reference `data/characters/*.json` shape and round-trips | HARNESS |
 | S1-AT-13 | The three sample characters | load them | each parses and carries name/race/attributes/equipment (they are 1e-era artifacts — see above) | HARNESS |
 | S1-AT-14 | The 40-case parity corpus | re-derive every saving throw and characteristic | **zero mismatches against the Python reference** | HARNESS |
+| S1-AT-15 | The reference sample characters | read their `credits` and their equipment | proves the reference's `credits` is a credit **pool**, not a balance | HARNESS |
+| S1-AT-16 | The rulebook corpus | diff the engine against it | the priority table, racial maximums, racial modifiers, saving throws, characteristics, Intuition's cost and the book's own worked example all match the **rulebook** | HARNESS |
 
 ---
 
@@ -397,3 +439,4 @@ attribute and `2 * (max_value - modifier) - assigned` for INTUITION.
 - **2026-10-20** — Added the value-cap contract (U-S1-7), with acceptance criteria UI-AT-11..UI-AT-13. It records the defect where the attribute fields were bounded by the remaining headroom rather than the racial maximum, so a character could never be spent beyond three points in an attribute.
 - **2026-10-20** — R-S1-9 and R-S1-10 amended: a character may finish creation without spending all of its credits, and the exported `credits` is the character's credit **pool**, not the balance left after the equipment. The reference's own sample characters are the evidence, and P-BUG-6 records that the reference never initialises `credits` at all.
 - **2026-10-20** — The input contract (U-S1-6) now covers the finished state: saving has to be obvious, because the character is written and the wizard stays open. Acceptance criterion UI-AT-12.
+- **2026-10-20** — Added the rulebook as a second, independent oracle: S1-AT-16 (engine vs the book's own tables and formulas) and UI-AT-13 (a finished exported character vs the book). The Source Evidence section now records the rulebook pages and the rulebook's own wording for the rules the engine implements.
