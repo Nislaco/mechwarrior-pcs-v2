@@ -9,6 +9,12 @@ extends RefCounted
 const Rules := preload("res://rules/mw_rules.gd")
 const SkillRules := preload("res://rules/mw_rules_skills.gd")
 
+## Where a finished character is written. R-S1-10.
+##
+## It lives here so that the wizard and the character sheet can both name
+## it without either preloading the other.
+const SAVE_PATH: String = "user://character.json"
+
 var name: String = ""
 var age: int = 0
 var height: int = 0

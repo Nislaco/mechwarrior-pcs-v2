@@ -321,6 +321,17 @@ trusting it.
 - **A `SpinBox` cannot take focus itself** — its `focus_mode` is `FOCUS_NONE`
   and the player types into the line edit inside it. Focusing the SpinBox
   warns and does nothing, so the line edit is focused instead.
+- **Saving must be obvious.** The character is written and the wizard stays
+  open, so a thin line of text is easy to miss — especially in the same
+  colour as an error message, and especially when pressing "Finish"
+  again would just re-save with no visible change. When a character is
+  saved: the sheet shows a bordered confirmation **above** the character
+  sheet (the sheet is long, so a confirmation underneath it would sit
+  below the fold, exactly where a player who has just pressed Finish
+  would not look); the message line turns green; the Finish button
+  becomes a disabled **Saved** button; and a **New Character** button
+  appears, because otherwise the only way to build a second character is
+  to restart the application.
 
 ## U-S1-7 A value control's maximum is its absolute cap
 
@@ -356,6 +367,7 @@ attribute and `2 * (max_value - modifier) - assigned` for INTUITION.
 | UI-AT-12 | A finished attribute set | read the final values | no attribute exceeds its racial maximum | HARNESS |
 | UI-AT-13 | The attributes step | open it | the keyboard lands in the first attribute's line edit, where the player can type | HARNESS |
 | UI-AT-11 | A character with credits unspent | finish the wizard | the equipment step is complete, the sheet reports the balance left, and the export keeps the credit pool so the balance is still derivable | HARNESS |
+| UI-AT-12 | A finished character | save it | a bordered confirmation appears above the sheet, the message line turns green, Finish becomes a disabled Saved button, and a New Character button appears that starts from scratch | HARNESS |
 
 ---
 
@@ -384,3 +396,4 @@ attribute and `2 * (max_value - modifier) - assigned` for INTUITION.
 - **2026-10-20** — Added the layout contract (U-S1-5) and the input contract (U-S1-6), with acceptance criteria UI-AT-8..UI-AT-10. These record four defects found by playing the wizard live: a collapsed body, a nested scroll container, a missing focus owner, and a value control that never reported an unchanged value.
 - **2026-10-20** — Added the value-cap contract (U-S1-7), with acceptance criteria UI-AT-11..UI-AT-13. It records the defect where the attribute fields were bounded by the remaining headroom rather than the racial maximum, so a character could never be spent beyond three points in an attribute.
 - **2026-10-20** — R-S1-9 and R-S1-10 amended: a character may finish creation without spending all of its credits, and the exported `credits` is the character's credit **pool**, not the balance left after the equipment. The reference's own sample characters are the evidence, and P-BUG-6 records that the reference never initialises `credits` at all.
+- **2026-10-20** — The input contract (U-S1-6) now covers the finished state: saving has to be obvious, because the character is written and the wizard stays open. Acceptance criterion UI-AT-12.

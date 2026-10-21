@@ -45,6 +45,7 @@ func _run_checks() -> void:
 	_test_equipment()
 	_test_export()
 	_test_credits()
+	await _test_finished_state()
 	
 	print("--- MechWarrior PCS Wizard Verification End: %d checks, %d failures ---" % [checks, failures])
 	quit(1 if failures > 0 else 0)
@@ -428,6 +429,75 @@ func _test_export() -> void:
 			"%s vs %d" % [str(character.get("credits")), wizard.draft.credits])
 
 
+# --- The finished state ---------------------------------------------------
+
+func _test_finished_state() -> void:
+	# Saving must be obvious.
+	#
+	# The character is written and the wizard stays open, so a thin line
+	# of text in the same colour as an error message is easy to miss --
+	# and pressing "Finish" again would just re-save with no visible
+	# change. The finished state says so.
+	wizard._show_step(5)
+	await process_frame
+	var step: Control = wizard.body.get_child(0)
+	var sheet_panel: Control = step.get_child(0).get_child(0)
+	var saved_panel: Control = sheet_panel.get_node("SavedPanel")
+	_check("UI-AT-12 the saved confirmation is hidden before saving",
+		not saved_panel.visible)
+	# It has to be ABOVE the sheet. The sheet is long, so a confirmation
+	# underneath it would sit below the fold -- exactly where a player
+	# who has just pressed Finish would not look.
+	_check("UI-AT-12 the saved confirmation is above the sheet, not below the fold",
+		sheet_panel.get_child(0) == saved_panel,
+		str(sheet_panel.get_child(0).name))
+	
+	wizard._on_next()
+	await process_frame
+	_check("UI-AT-12 the saved confirmation appears after saving",
+		saved_panel.visible)
+	var saved_text: String = saved_panel.get_child(0).text
+	_check("UI-AT-12 the confirmation names the file and says it is saved",
+		saved_text.contains("Character saved") and saved_text.contains("user://character.json"),
+		saved_text)
+	
+	# The message line is a success, not an error.
+	_check("UI-AT-12 the message line reports the save",
+		wizard.message_label.text.contains("Character saved"),
+		wizard.message_label.text)
+	
+	# The Finish button becomes a Saved button, and there is a way to
+	# start another character.
+	_check("UI-AT-12 the Finish button becomes Saved",
+		wizard.next_button.text == "Saved" and wizard.next_button.disabled,
+		"%s disabled=%s" % [wizard.next_button.text, str(wizard.next_button.disabled)])
+	_check("UI-AT-12 a New Character button appears", wizard.new_character_button.visible)
+	
+	# A new character starts from scratch. The priorities are back at
+	# their defaults (which is what resolves the race), and nothing has
+	# been bought.
+	wizard.new_character_button.pressed.emit()
+	await process_frame
+	var fresh_priorities: bool = true
+	for category in wizard.draft.priorities:
+		if int(wizard.draft.priorities[category]) != 0:
+			fresh_priorities = false
+	_check("UI-AT-12 a new character starts from scratch",
+		wizard.step_index == 0
+		and fresh_priorities
+		and wizard.draft.equipment.is_empty()
+		and wizard.draft.purchased_skills.is_empty()
+		and wizard.draft.purchased_advantages.is_empty()
+		and wizard.draft.attribute_spent.is_empty(),
+		"step %d race=%s" % [wizard.step_index, wizard.draft.race])
+	# Next is legitimately disabled on the first step until the priority
+	# assignment is valid; what matters is that the finished state is gone.
+	_check("UI-AT-12 the new character resets the finished state",
+		not wizard.new_character_button.visible
+		and wizard.next_button.text == "Next",
+		"%s" % wizard.next_button.text)
+
+
 # --- Credits ---------------------------------------------------------------
 
 func _test_credits() -> void:
@@ -459,7 +529,7 @@ func _test_credits() -> void:
 	# The sheet shows the pool, the spend and the balance.
 	wizard._show_step(5)
 	var sheet: Control = wizard.body.get_child(0)
-	var sheet_text: String = sheet.get_child(0).get_child(0).get_child(0).text
+	var sheet_text: String = sheet.get_child(0).get_child(0).get_node("Sheet").text
 	_check("UI-AT-11 the sheet reports the credits left",
 		sheet_text.contains("%d remaining" % remaining), sheet_text)
 	

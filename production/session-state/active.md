@@ -30,6 +30,7 @@
 - **A character does not have to spend all of its credits.** The credits are the character's *pool*; the balance left after the equipment is still the character's, and creation completes with it unspent. The reference's own sample characters are the evidence: each stores a fixed pool (5,000 / 25,000 / 50,000) that does not change with what the character carries, and `john_star` carries 22,810 of equipment against a pool of 5,000 — a remaining balance could not be negative. The port had been exporting the *leftover* in the `credits` field, which disagreed with every reference character; it now exports the pool, and the balance is derived (pool − equipment cost). (R-S1-9, R-S1-10)
 - **The reference's credit handling is entirely unenforced** — `credits` is never initialised in `chargen.py`'s `main()`, so the equipment step raises `UnboundLocalError`, and `purchase_equipment` never checks a budget anyway. Recorded as P-BUG-6.
 - **`SpinBox` cannot take focus** — its `focus_mode` is `FOCUS_NONE` and the player types into the line edit inside it. Focusing the SpinBox warned and did nothing, so the wizard now focuses the line edit. (U-S1-6)
+- **Saving was too easy to miss.** The character is written and the wizard stays open, so the only feedback was a thin line of text in the *same red as an error message*, the button still said "Finish", and there was no way to start another character without restarting the app. The sheet now shows a bordered confirmation **above** the character sheet (below the fold it was invisible), the message line turns green, Finish becomes a disabled **Saved** button, and a **New Character** button appears. (U-S1-6, UI-AT-12)
 - **A plain `OptionButton` only changes value through its popup**, and a popup opened with the mouse starts its highlight on "no item", so the first arrow press lands on the first entry instead of moving one step from the current value. `src/ui/level_option.gd` makes a focused dropdown answer the arrow keys directly.
 - **The shipped sample characters are 1e-era artifacts, not 2e output.** `character_export.py` uses `STRENGTH`/`MEMORY` attributes and `MUSCLES`/`BODY`/`NERVES`/`MIND` characteristics, which contradict the 2e rules in `chargen.py`. They are kept only because the combat tracker consumes them, and are explicitly *not* used as a parity oracle.
 - **The parity oracle is now generated from the reference itself.** `tools/gen_parity_corpus.py` imports `chargen.py` and emits `src/data/parity_corpus.json` (40 attribute sets with the reference's own saving throws and characteristics). The GDScript engine re-derives them and the harness diffs — a true cross-check of the port, not a self-consistency check. **Zero mismatches.**
@@ -42,7 +43,7 @@
 ## Verification
 
 - `godot --headless --path src -s res://scripts/verify_rules.gd` → **67 checks, 0 failures**, exit 0.
-- `godot --headless --path src -s res://scripts/verify_wizard.gd` → **71 checks, 0 failures**, exit 0.
+- `godot --headless --path src -s res://scripts/verify_wizard.gd` → **80 checks, 0 failures**, exit 0.
 - `godot --headless --path src --quit-after 90` → exit 0, 0 script errors.
 - `codex-game-studio validate` → **1216 PASS / 0 FAIL / 0 WARN**, exit 0.
 - Godot MCP bridge: connects, reports the project by name and path, live scene tree and runtime script inspection both work.
@@ -61,5 +62,5 @@
 ## Documentation Impact
 
 - Decision: updated
-- Reason: a functional change was made — a character may now finish creation without spending all of its credits, the exported `credits` is the character's credit pool (matching the reference schema and its sample characters) rather than the leftover balance, and the sheet and equipment step report the pool, the spend and the balance. R-S1-9 and R-S1-10 were amended and P-BUG-6 was added for the reference's uninitialised credit pool.
+- Reason: a functional change was made — the finished state is now unmistakable (a bordered confirmation above the character sheet, a green message, a disabled Saved button, and a New Character button), so a saved character cannot be mistaken for one that failed to save. The input contract (U-S1-6) and acceptance criterion UI-AT-12 record it.
 - Documents: design/systems/character-creation.md, production/session-state/active.md

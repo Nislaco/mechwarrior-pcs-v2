@@ -47,13 +47,19 @@ var body: VBoxContainer
 var footer: HBoxContainer
 var back_button: Button
 var next_button: Button
+var new_character_button: Button
 var message_label: Label
+
+## Where a finished character is written. R-S1-10.
+const SAVE_PATH: String = Draft.SAVE_PATH
 
 const COL_BG: Color = Color(0.10, 0.10, 0.15)
 const COL_PANEL: Color = Color(0.15, 0.15, 0.22)
 const COL_ACCENT: Color = Color(0.95, 0.78, 0.25)
 const COL_TEXT: Color = Color(0.88, 0.88, 0.92)
 const COL_MUTED: Color = Color(0.62, 0.62, 0.70)
+const COL_ERROR: Color = Color(0.95, 0.55, 0.45)
+const COL_OK: Color = Color(0.55, 0.85, 0.55)
 
 
 func _ready() -> void:
@@ -107,8 +113,8 @@ func _build_shell() -> void:
 	# Message line (validation feedback from the current step).
 	message_label = Label.new()
 	message_label.name = "Message"
-	message_label.add_theme_font_size_override("font_size", 13)
-	message_label.add_theme_color_override("font_color", Color(0.95, 0.55, 0.45))
+	message_label.add_theme_font_size_override("font_size", 14)
+	message_label.add_theme_color_override("font_color", COL_ERROR)
 	message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(message_label)
 	
@@ -125,6 +131,16 @@ func _build_shell() -> void:
 	back_button.custom_minimum_size = Vector2(140, 40)
 	back_button.pressed.connect(_on_back)
 	footer.add_child(back_button)
+	
+	# Appears once a character has been saved, so a second one can be
+	# built without restarting the application.
+	new_character_button = Button.new()
+	new_character_button.name = "NewCharacterButton"
+	new_character_button.text = "New Character"
+	new_character_button.custom_minimum_size = Vector2(180, 40)
+	new_character_button.visible = false
+	new_character_button.pressed.connect(_on_new_character)
+	footer.add_child(new_character_button)
 	
 	next_button = Button.new()
 	next_button.name = "NextButton"
@@ -248,18 +264,39 @@ func _on_back() -> void:
 
 func _finish() -> void:
 	# The final step is the character sheet; finishing writes the export.
+	var saved: bool = false
 	if step and step.has_method("finish"):
-		step.finish()
-	_show_message("Character created. %d skills, %d advantages, %d pieces of equipment, %d credits remaining." % [
+		saved = bool(step.finish())
+	if not saved:
+		_show_message("Could not save the character to %s." % SAVE_PATH)
+		return
+	# Make the finished state unmistakable. A thin line of text in the
+	# same colour as an error message is easy to miss, and pressing
+	# "Finish" again would otherwise just re-save with no visible change.
+	next_button.text = "Saved"
+	next_button.disabled = true
+	new_character_button.visible = true
+	_show_message("Character saved to %s.  %d skills, %d advantages, %d pieces of equipment, %d credits remaining." % [
+		SAVE_PATH,
 		draft.purchased_skills.size(),
 		draft.purchased_advantages.size(),
 		draft.equipment.size(),
 		draft.remaining_credits(),
-	])
+	], true)
 
 
-func _show_message(text: String) -> void:
+## Start a fresh character. The wizard stays open, so this is how a
+## second character is built.
+func _on_new_character() -> void:
+	draft = Draft.new()
+	new_character_button.visible = false
+	_show_step(0)
+	_show_message("")
+
+
+func _show_message(text: String, ok: bool = false) -> void:
 	message_label.text = text
+	message_label.add_theme_color_override("font_color", COL_OK if ok else COL_ERROR)
 
 
 func _update_footer() -> void:
@@ -277,8 +314,7 @@ func refresh() -> void:
 
 
 ## Save the finished character to user://. R-S1-10.
-func save_character(filename: String = "character.json") -> bool:
-	var path: String = "user://%s" % filename
+func save_character(path: String = SAVE_PATH) -> bool:
 	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
 	if not file:
 		return false
