@@ -137,12 +137,6 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 			{"name": "Standard Laser Rifle", "cost": 1250},
 			{"name": "Noteputer", "cost": 500},
 		],
-		"Light": [
-			{"name": "Light Neural Implant", "cost": 500},
-			{"name": "Light Armor", "cost": 5000},
-			{"name": "Energy Weapon", "cost": 2000},
-			{"name": "Stealth Equipment", "cost": 3000},
-		],
 	},
 	"Clan Warrior": {
 		"Standard": [
@@ -151,12 +145,6 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 			{"name": "Clan Laser Pistol", "cost": 750},
 			{"name": "Clan Laser Rifle", "cost": 1250},
 			{"name": "Noteputer", "cost": 500},
-		],
-		"Light": [
-			{"name": "Light Neural Implant", "cost": 500},
-			{"name": "Light Armor", "cost": 5000},
-			{"name": "Energy Weapon", "cost": 2000},
-			{"name": "Stealth Equipment", "cost": 3000},
 		],
 	},
 	"Clan Pilot": {
@@ -167,12 +155,6 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 			{"name": "Clan Laser Rifle", "cost": 1250},
 			{"name": "Noteputer", "cost": 500},
 		],
-		"Light": [
-			{"name": "Light Neural Implant", "cost": 500},
-			{"name": "Light Armor", "cost": 5000},
-			{"name": "Energy Weapon", "cost": 2000},
-			{"name": "Stealth Equipment", "cost": 3000},
-		],
 	},
 	"Elemental": {
 		"Standard": [
@@ -182,12 +164,6 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 			{"name": "Clan Laser Pistol", "cost": 750},
 			{"name": "Clan Laser Rifle", "cost": 1250},
 			{"name": "Noteputer", "cost": 500},
-		],
-		"Light": [
-			{"name": "Light Neural Implant", "cost": 500},
-			{"name": "Light Armor", "cost": 5000},
-			{"name": "Energy Weapon", "cost": 2000},
-			{"name": "Stealth Equipment", "cost": 3000},
 		],
 	},
 }
@@ -215,42 +191,6 @@ static func equipment_affordable(equipment: Array, credits: int) -> bool:
 	return equipment_total_cost(equipment) <= credits
 
 
-## The weapon damage and armor defense a character carries, derived from
-## their equipment list. Used by the (future) combat tracker and shown on
-## the sheet.
-static func equipment_combat_stats(equipment: Array) -> Dictionary:
-	var weapon_damage: int = 0
-	var armor_defense: int = 0
-	for item in equipment:
-		var name: String = str(item.get("name", ""))
-		var t: String = name.to_lower()
-		if t.contains("pistol") or t.contains("rifle") or t.contains("weapon"):
-			if weapon_damage == 0:
-				weapon_damage = _damage_from_name(name)
-		elif t.contains("armor") or t.contains("suit") or t.contains("neurohelmet") or t.contains("helmet"):
-			if armor_defense == 0:
-				armor_defense = _defense_from_name(name)
-	return {"weapon_damage": weapon_damage, "armor_defense": armor_defense}
-
-
-static func _damage_from_name(name: String) -> int:
-	# The reference uses a flat per-archetype damage figure; the sample
-	# characters use 8 (John Star) / 6 (Viper) / 4 (Dr. Sarah Chen).
-	match name:
-		"Standard Laser Pistol", "Standard Laser Rifle", "Clan Laser Pistol", "Clan Laser Rifle":
-			return 8
-		"Energy Weapon":
-			return 6
-	return 4
-
-
-static func _defense_from_name(name: String) -> int:
-	match name:
-		"MechWarrior Combat Suit", "Clan Armor", "Clan Battle Armor":
-			return 2
-		"Light Armor":
-			return 1
-	return 0
 
 
 # ---------------------------------------------------------------------------
