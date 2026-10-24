@@ -125,7 +125,10 @@ static func apply_flexible_package(package_spec: Dictionary, choices: Dictionary
 # R-S1-9 — equipment
 # ---------------------------------------------------------------------------
 
-## Archetype equipment lists. Costs are as in the Python reference.
+## Archetype equipment lists. Costs and item sets are as in the Python
+## reference. The Standard and Light (infiltrator) variants are source
+## material; some items (e.g. the neural implants, hold-out pistols) are
+## archetype-only and do not appear in the individual purchase tables.
 const ARCHETYPE_EQUIPMENT: Dictionary = {
 	"Human": {
 		"Standard": [
@@ -137,6 +140,12 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 			{"name": "Standard Laser Rifle", "cost": 1250},
 			{"name": "Noteputer", "cost": 500},
 		],
+		"Light": [
+			{"name": "Light Neural Implant", "cost": 500},
+			{"name": "Ablative Vest", "cost": 400},
+			{"name": "Hold-Out Laser Pistol", "cost": 100},
+			{"name": "Noteputer", "cost": 500},
+		],
 	},
 	"Clan Warrior": {
 		"Standard": [
@@ -144,6 +153,12 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 			{"name": "Clan Armor", "cost": 20000},
 			{"name": "Clan Laser Pistol", "cost": 750},
 			{"name": "Clan Laser Rifle", "cost": 1250},
+			{"name": "Noteputer", "cost": 500},
+		],
+		"Light": [
+			{"name": "Light Neural Implant", "cost": 500},
+			{"name": "Ablative Vest", "cost": 400},
+			{"name": "Hold-Out Laser Pistol", "cost": 100},
 			{"name": "Noteputer", "cost": 500},
 		],
 	},
@@ -155,6 +170,12 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 			{"name": "Clan Laser Rifle", "cost": 1250},
 			{"name": "Noteputer", "cost": 500},
 		],
+		"Light": [
+			{"name": "Light Neural Implant", "cost": 500},
+			{"name": "Ablative Vest", "cost": 400},
+			{"name": "Hold-Out Laser Pistol", "cost": 100},
+			{"name": "Noteputer", "cost": 500},
+		],
 	},
 	"Elemental": {
 		"Standard": [
@@ -163,6 +184,13 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 			{"name": "Clan Neurohelmet", "cost": 5000},
 			{"name": "Clan Laser Pistol", "cost": 750},
 			{"name": "Clan Laser Rifle", "cost": 1250},
+			{"name": "Noteputer", "cost": 500},
+		],
+		"Light": [
+			{"name": "Light Neural Implant", "cost": 500},
+			{"name": "Ablative Vest", "cost": 400},
+			{"name": "Combat Neurohelmet", "cost": 1400},
+			{"name": "Clan Hold-Out Laser Pistol", "cost": 100},
 			{"name": "Noteputer", "cost": 500},
 		],
 	},

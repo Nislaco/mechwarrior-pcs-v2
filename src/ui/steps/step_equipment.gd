@@ -60,7 +60,7 @@ func _refresh() -> void:
 	title.add_theme_font_size_override("font_size", 15)
 	_list.add_child(title)
 	
-	for variant in ["Standard"]:
+	for variant in ["Standard", "Light"]:
 		var kit: Array = SkillRules.archetype_equipment(draft.race, variant)
 		if kit.is_empty():
 			continue

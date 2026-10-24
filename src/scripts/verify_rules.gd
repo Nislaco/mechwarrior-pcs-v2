@@ -391,10 +391,17 @@ func _test_skills() -> void:
 
 func _test_equipment() -> void:
 	# Archetype lists exist per race.
-	_check("S1-AT-9 a Human has a Standard archetype",
-		SkillRules.archetype_equipment("Human", "Standard").size() > 0)
-	_check("S1-AT-9 an Elemental has its own archetype list",
-		SkillRules.archetype_equipment("Elemental", "Standard").size() > 0)
+	_check("S1-AT-9 a Human has Standard and Light archetypes",
+		SkillRules.archetype_equipment("Human", "Standard").size() > 0
+		and SkillRules.archetype_equipment("Human", "Light").size() > 0)
+	_check("S1-AT-9 an Elemental has Standard and Light archetypes",
+		SkillRules.archetype_equipment("Elemental", "Standard").size() > 0
+		and SkillRules.archetype_equipment("Elemental", "Light").size() > 0)
+	# The Light (infiltrator) package is race-specific: non-Elemental
+	# races get a Hold-Out Laser Pistol, Elementals get a Combat Neurohelmet
+	# and a Clan Hold-Out Laser Pistol.
+	_check("S1-AT-9 the Light package is race-specific",
+		SkillRules.archetype_equipment("Human", "Light") != SkillRules.archetype_equipment("Elemental", "Light"))
 	
 	# Totals and affordability.
 	var kit: Array = SkillRules.archetype_equipment("Human", "Standard")
