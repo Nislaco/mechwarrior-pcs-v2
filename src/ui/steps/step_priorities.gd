@@ -44,15 +44,36 @@ func build(_body: Control) -> void:
 	scroll.add_child(panel)
 	
 	# Rule choice.
-	var mode_row := HBoxContainer.new()
+	# A highlighted panel so the rule toggle stands out on the dark theme.
+	var mode_row := PanelContainer.new()
 	mode_row.name = "ModeRow"
+	mode_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var mode_style := StyleBoxFlat.new()
+	mode_style.bg_color = Color(0.13, 0.18, 0.32)
+	mode_style.border_color = Color(0.95, 0.78, 0.25)
+	mode_style.set_border_width_all(1)
+	mode_style.set_corner_radius_all(6)
+	mode_style.content_margin_left = 12
+	mode_style.content_margin_right = 12
+	mode_style.content_margin_top = 8
+	mode_style.content_margin_bottom = 8
+	mode_row.add_theme_stylebox_override("panel", mode_style)
 	panel.add_child(mode_row)
+	
+	var mode_inner := HBoxContainer.new()
+	mode_inner.name = "ModeInner"
+	mode_inner.add_theme_constant_override("separation", 10)
+	mode_row.add_child(mode_inner)
 	
 	_use_flexible = CheckBox.new()
 	_use_flexible.name = "FlexibleCheck"
-	_use_flexible.text = "Use the optional Flexible Priorities rule (manual p. 15) - distribute 10 Character Points instead of using 0-4 once each"
+	_use_flexible.text = "Flexible Priorities: distribute 10 Character Points (instead of assigning 0-4 once each)"
+	_use_flexible.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_use_flexible.add_theme_color_override("font_color", Color(0.85, 0.85, 0.92))
+	_use_flexible.add_theme_color_override("font_hover_color", Color(0.95, 0.78, 0.25))
+	_use_flexible.add_theme_color_override("font_pressed_color", Color(0.95, 0.78, 0.25))
 	_use_flexible.toggled.connect(_on_mode_toggled)
-	mode_row.add_child(_use_flexible)
+	mode_inner.add_child(_use_flexible)
 	
 	# One row per category.
 	for category in Rules.CATEGORIES:

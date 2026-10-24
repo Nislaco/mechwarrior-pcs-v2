@@ -119,20 +119,26 @@ func _refresh_packages(remaining: int) -> void:
 		
 		var label := Label.new()
 		label.name = "Name"
-		label.text = "%s  (%d points)" % [package_name, int(spec.get("cost", 0))]
-		label.custom_minimum_size = Vector2(420, 0)
+		label.text = "%s  (%d pts)" % [package_name, int(spec.get("cost", 0))]
+		label.custom_minimum_size = Vector2(220, 0)
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(label)
 		
 		var summary := Label.new()
 		summary.name = "Summary"
 		summary.add_theme_color_override("font_color", Color(0.62, 0.62, 0.70))
 		summary.text = _package_summary(spec)
+		summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		summary.custom_minimum_size = Vector2(0, 36)
+		summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		summary.clip_text = true
 		row.add_child(summary)
 		
 		var button := Button.new()
 		button.name = "Buy"
 		button.text = "Buy"
-		button.custom_minimum_size = Vector2(90, 0)
+		button.custom_minimum_size = Vector2(80, 36)
+		button.size_flags_horizontal = Control.SIZE_SHRINK_END
 		button.pressed.connect(_on_buy_package.bind(package_name, spec))
 		row.add_child(button)
 		
