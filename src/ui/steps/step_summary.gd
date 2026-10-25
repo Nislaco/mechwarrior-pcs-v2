@@ -208,7 +208,7 @@ func _on_save_report_btn_pressed() -> void:
 		_save_dialog = FileDialog.new()
 		_save_dialog.name = "ReportFileDialog"
 		_save_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
-		_save_dialog.access_path = "."
+		_save_dialog.access_path = OS.get_environment("HOME")
 		_save_dialog.file_added.connect(_on_file_added)
 		_save_dialog.canceled.connect(_on_dialog_canceled)
 		_panel.add_child(_save_dialog)
