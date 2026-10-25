@@ -203,20 +203,19 @@ func _skill_characteristic(skill: String) -> String:
 
 
 ## Open the file dialog so the player can choose where to save the report.
+## Uses ACCESS_FILESYSTEM so the dialog is not sandboxed to res:// or user://.
 func _on_save_report_btn_pressed() -> void:
 	if _save_dialog == null:
 		_save_dialog = FileDialog.new()
 		_save_dialog.name = "ReportFileDialog"
 		_save_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
-		_save_dialog.access_path = OS.get_environment("HOME")
+		_save_dialog.access = FileDialog.ACCESS_FILESYSTEM
 		_save_dialog.file_added.connect(_on_file_added)
 		_save_dialog.canceled.connect(_on_dialog_canceled)
 		_panel.add_child(_save_dialog)
 	
-	# Default to the directory where the character JSON was saved.
-	var saved_path: String = Draft.SAVE_PATH
-	var dir_path: String = saved_path.get_base_dir()
-	_save_dialog.current_dir = dir_path
+	# Start in the user's home directory.
+	_save_dialog.access_path = OS.get_environment("HOME")
 	_save_dialog.current_file = "character_report.txt"
 	
 	_save_dialog.popup_centered_ratio()
