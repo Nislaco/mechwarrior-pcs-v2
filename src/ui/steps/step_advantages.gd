@@ -74,7 +74,7 @@ func _refresh() -> void:
 		return
 	
 	for advantage in available:
-		_list.add_child(_make_available_row(advantage, int(available[advantage])))
+		_list.add_child(_make_available_row(advantage, int(available[advantage]), remaining))
 
 
 func _make_purchased_row(advantage: String, cost: int) -> Control:
@@ -92,7 +92,7 @@ func _make_purchased_row(advantage: String, cost: int) -> Control:
 	return row
 
 
-func _make_available_row(advantage: String, cheapest: int) -> Control:
+func _make_available_row(advantage: String, cheapest: int, remaining: int) -> Control:
 	var row := HBoxContainer.new()
 	row.name = "Offer_%s" % advantage
 	row.add_theme_constant_override("separation", 8)
@@ -105,9 +105,9 @@ func _make_available_row(advantage: String, cheapest: int) -> Control:
 	
 	var tiers: Array[int] = Rules.advantage_cost_tiers(advantage)
 	if tiers.size() > 1:
-		# Variable cost: offer each affordable tier.
+		# Variable cost: offer each tier up to what the player can afford.
 		for tier in tiers:
-			if tier > cheapest:
+			if tier > remaining:
 				continue
 			row.add_child(_make_buy_button(advantage, tier))
 	else:
