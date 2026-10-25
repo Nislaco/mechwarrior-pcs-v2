@@ -105,12 +105,14 @@ func _build_package_select_panel(parent: Control) -> void:
 	outer.add_child(_pkg_select_title)
 	
 	_pkg_select_scroll = ScrollContainer.new()
+	_pkg_select_scroll.name = "Scroll"
 	_pkg_select_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_pkg_select_scroll.custom_minimum_size = Vector2(0, 200)
 	_pkg_select_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	outer.add_child(_pkg_select_scroll)
 	
 	_pkg_select_body = VBoxContainer.new()
+	_pkg_select_body.name = "Body"
 	_pkg_select_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_pkg_select_body.add_theme_constant_override("separation", 4)
 	_pkg_select_scroll.add_child(_pkg_select_body)
@@ -307,6 +309,7 @@ func _populate_package_select_panel(spec: Dictionary) -> void:
 			opt.select(0)
 		opt.item_selected.connect(_on_pkg_skill_level.bind(str(skill), slots))
 		row.add_child(opt)
+		opt.set_meta("skill", str(skill))
 		_pkg_select_dropdowns[str(skill)] = opt
 		
 		_pkg_select_body.add_child(row)
@@ -336,6 +339,7 @@ func _populate_package_select_panel(spec: Dictionary) -> void:
 		opt.select(0)  # default: skip
 		opt.item_selected.connect(_on_pkg_skill_level.bind(str(skill), slots))
 		row.add_child(opt)
+		opt.set_meta("skill", str(skill))
 		_pkg_select_dropdowns[str(skill)] = opt
 		
 		_pkg_select_body.add_child(row)
@@ -346,7 +350,7 @@ func _on_pkg_skill_level(_index: int, skill: String, slots: Dictionary) -> void:
 	var choices: Dictionary = {}
 	for key in _pkg_select_dropdowns:
 		var opt: OptionButton = _pkg_select_dropdowns[key]
-		choices[key] = int(opt.selected_id)
+		choices[key] = int(opt.get_item_id(opt.selected))
 	_update_slot_summary(slots, choices)
 	_update_confirm_state(slots, choices)
 
@@ -400,7 +404,7 @@ func _on_package_select_confirm() -> void:
 	var choices: Dictionary = {}
 	for key in _pkg_select_dropdowns:
 		var opt: OptionButton = _pkg_select_dropdowns[key]
-		choices[key] = int(opt.selected_id)
+		choices[key] = int(opt.get_item_id(opt.selected))
 	
 	var applied: Dictionary = draft.purchased_skills.duplicate(true)
 	applied = SkillRules.apply_flexible_package(spec, choices, applied)

@@ -42,6 +42,7 @@ func _run_checks() -> void:
 	_test_advantage_purchase()
 	await _test_attribute_allocation()
 	await _test_skill_package()
+	await _test_flexible_package()
 	_test_export()
 	# Before the finished-state test, which starts a fresh character.
 	_test_export_against_rulebook()
@@ -364,6 +365,84 @@ func _test_skill_package() -> void:
 	_check("UI-AT-5 the individual skill list is populated", skill_list.get_child_count() > 40,
 		str(skill_list.get_child_count()))
 
+	# A fixed package applies immediately; it must not open the flexible panel.
+	var flex_panel_after_fixed: PanelContainer = panel.get_node_or_null("PackageSelectPanel")
+	_check("UI-AT-5 a fixed package does not open the flexible selection panel",
+		flex_panel_after_fixed == null or not flex_panel_after_fixed.visible)
+
+
+
+
+## Recursively collect OptionButtons under a node, in tree order.
+func _collect_option_buttons(node: Node, out: Array) -> void:
+	for c in node.get_children():
+		if c is OptionButton:
+			out.append(c)
+		_collect_option_buttons(c, out)
+
+
+func _test_flexible_package() -> void:
+	# Only the Human race has flexible (skills_at_level) packages, so a
+	# dedicated Human draft drives the selection-panel path the other
+	# packages never exercise.
+	var saved_race: String = wizard.draft.race
+	var saved_selected_pkg: String = wizard.draft.selected_package
+	var saved_purchased: Dictionary = wizard.draft.purchased_skills.duplicate(true)
+	var saved_base_skills: Dictionary = wizard.draft.package_base_skills.duplicate(true)
+	var saved_flat_cost: int = wizard.draft.package_flat_cost
+	wizard.draft.race = "Human"
+	wizard.draft.selected_package = ""
+	wizard.draft.purchased_skills = {}
+	wizard.draft.package_base_skills = {}
+	wizard.draft.package_flat_cost = 0
+	wizard._show_step(3)
+	await process_frame
+	var step: Control = wizard.body.get_child(0)
+	var panel: VBoxContainer = step.get_child(0).get_child(0)
+	var list: VBoxContainer = panel.get_node("PackageList")
+	var rows: Array = []
+	for i in range(list.get_child_count()):
+		var row: Control = list.get_child(i)
+		if row.name.begins_with("Package_"):
+			rows.append(row)
+	_check("UI-AT-5F a Human flexible package is offered", rows.size() > 0, str(rows.size()))
+	if rows.size() == 0:
+		return
+	rows[0].get_node("Buy").pressed.emit()
+	await process_frame
+	var panel2: PanelContainer = panel.get_node_or_null("PackageSelectPanel")
+	_check("UI-AT-5F the flexible selection panel is shown",
+		panel2 != null and panel2.visible)
+	if panel2 == null or not panel2.visible:
+		return
+	var body: VBoxContainer = panel2.get_node("VBox/Scroll/Body")
+	var dropdowns: Array = []
+	# The level dropdowns sit inside per-skill HBoxContainer rows.
+	_collect_option_buttons(body, dropdowns)
+	_check("UI-AT-5F the panel lists a slot dropdown per required and elective skill",
+		dropdowns.size() >= 8, str(dropdowns.size()))
+	# The first required-skill dropdown defaults to a real slot level (>0).
+	var first_req: OptionButton = dropdowns[0]
+	var first_level: int = int(first_req.get_item_id(first_req.selected))
+	_check("UI-AT-5F a required skill defaults to a real level slot", first_level > 0,
+		str(first_level))
+	panel2.get_node("VBox/ButtonRow/ConfirmPurchase").pressed.emit()
+	await process_frame
+	_check("UI-AT-5F confirming applies the package",
+		not wizard.draft.selected_package.is_empty(), wizard.draft.selected_package)
+	_check("UI-AT-5F the required skill level lands in purchased_skills",
+		int(wizard.draft.purchased_skills.get(first_req.get_meta("skill", ""), 0)) >= 1,
+		str(wizard.draft.purchased_skills))
+	_check("UI-AT-5F the package base level is recorded",
+		int(wizard.draft.package_base_skills.get(first_req.get_meta("skill", ""), 0)) >= 1)
+	_check("UI-AT-5F the panel is hidden after confirming", not panel2.visible)
+	# Restore the wizard state so downstream tests are unaffected.
+	wizard.draft.race = saved_race
+	wizard.draft.selected_package = saved_selected_pkg
+	wizard.draft.purchased_skills = saved_purchased
+	wizard.draft.package_base_skills = saved_base_skills
+	wizard.draft.package_flat_cost = saved_flat_cost
+	wizard.draft.recompute_attributes()
 
 func _test_export() -> void:
 	wizard._show_step(4)
