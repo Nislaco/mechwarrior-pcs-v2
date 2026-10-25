@@ -170,17 +170,18 @@ func _on_buy_package(package_name: String, spec: Dictionary) -> void:
 	if str(spec.get("kind", "")) == "fixed":
 		applied = SkillRules.apply_fixed_package(spec, applied)
 		# Record the package grant level for each fixed skill.
-		for skill, level in spec.get("skills", {}).items():
-			pkg_base[skill] = int(level)
+		var fixed_skills: Dictionary = spec.get("skills", {})
+		for skill in fixed_skills:
+			pkg_base[skill] = int(fixed_skills[skill])
 	else:
 		var choices: Dictionary = {}
 		for skill in spec.get("required_skills", []):
 			choices[skill] = 2
 		applied = SkillRules.apply_flexible_package(spec, choices, applied)
-		# Record the package grant level: the slot level chosen for each skill.
-		for skill, level in choices.items():
-			if int(level) > 0:
-				pkg_base[skill] = int(level)
+		var choices_dict: Dictionary = choices
+		for skill in choices_dict:
+			if int(choices_dict[skill]) > 0:
+				pkg_base[skill] = int(choices_dict[skill])
 	draft.purchased_skills = applied
 	draft.selected_package = package_name
 	draft.package_base_skills = pkg_base
@@ -215,7 +216,7 @@ func _refresh_skills(_remaining: int) -> void:
 		option.item_selected.connect(_on_skill_level.bind(skill))
 		row.add_child(option)
 		
-		var cost: Label.new()
+		var cost = Label.new()
 		cost.name = "Cost"
 		cost.custom_minimum_size = Vector2(120, 0)
 		cost.add_theme_color_override("font_color", Color(0.62, 0.62, 0.70))
