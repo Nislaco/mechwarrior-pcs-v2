@@ -165,18 +165,28 @@ func _on_buy_package(package_name: String, spec: Dictionary) -> void:
 	# package's required skills at their slot levels and leaves electives
 	# to the individual-skill list below).
 	var applied: Dictionary = draft.purchased_skills.duplicate(true)
+	var pkg_base: Dictionary = {}
+	var pkg_cost: int = int(spec.get("cost", 0))
 	if str(spec.get("kind", "")) == "fixed":
 		applied = SkillRules.apply_fixed_package(spec, applied)
+		# Record the package grant level for each fixed skill.
+		for skill, level in spec.get("skills", {}).items():
+			pkg_base[skill] = int(level)
 	else:
 		var choices: Dictionary = {}
 		for skill in spec.get("required_skills", []):
 			choices[skill] = 2
 		applied = SkillRules.apply_flexible_package(spec, choices, applied)
+		# Record the package grant level: the slot level chosen for each skill.
+		for skill, level in choices.items():
+			if int(level) > 0:
+				pkg_base[skill] = int(level)
 	draft.purchased_skills = applied
 	draft.selected_package = package_name
+	draft.package_base_skills = pkg_base
+	draft.package_flat_cost = pkg_cost
 	_refresh()
 	wizard.refresh()
-
 
 func _refresh_skills(_remaining: int) -> void:
 	var learn: int = int(draft.final_attributes.get("LEARN", 0))
@@ -205,11 +215,11 @@ func _refresh_skills(_remaining: int) -> void:
 		option.item_selected.connect(_on_skill_level.bind(skill))
 		row.add_child(option)
 		
-		var cost := Label.new()
+		var cost: Label.new()
 		cost.name = "Cost"
 		cost.custom_minimum_size = Vector2(120, 0)
 		cost.add_theme_color_override("font_color", Color(0.62, 0.62, 0.70))
-		cost.text = "%d point%s" % [owned, "" if owned == 1 else "s"]
+		cost.text = "%d point%s" % [owned * (owned + 1) / 2, "" if owned == 1 else "s"]
 		row.add_child(cost)
 		
 		_skill_list.add_child(row)
@@ -236,17 +246,16 @@ func _on_skill_level(index: int, skill: String) -> void:
 	var previous: int = int(draft.purchased_skills.get(skill, 0))
 	if level == previous:
 		return
-	# The pool must not be overspent. Refuse the change and put the
-	# control back where it was, rather than letting the player wedge
-	# themselves with an un-affordable character.
-	var cost: int = level - previous
-	if cost > 0 and cost > draft.remaining_skill_points():
+	# R-S1-8.  The cost to reach level L is triangular: L*(L+1)/2 points.
+	# Raising from `previous` to `level` costs triangular(level) - triangular(previous).
+	# Lowering is always free.
+	var marginal: int = level * (level + 1) / 2 - previous * (previous + 1) / 2
+	if marginal > 0 and marginal > draft.remaining_skill_points():
 		return
 	draft.purchased_skills[skill] = level
 	draft.recompute_attributes()
 	_refresh()
 	wizard.refresh()
-
 
 func is_complete() -> bool:
 	# Skills are optional, but the pool must not be overspent.

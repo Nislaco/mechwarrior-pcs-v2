@@ -45,6 +45,12 @@ var characteristics: Dictionary = {}
 # --- Skills (R-S1-8) ---
 var purchased_skills: Dictionary = {}      # skill -> level
 var selected_package: String = ""
+## Levels a purchased package granted each skill, "for free" up to those
+## levels. Any level above a package base is charged at the standard
+## incremental cost (triangular). Empty when no package is bought.
+var package_base_skills: Dictionary = {}  # skill -> level granted by package
+## The flat point fee paid for the selected package (0 if none).
+var package_flat_cost: int = 0
 var skill_targets: Dictionary = {}
 
 # --- Equipment (R-S1-9) ---
@@ -89,10 +95,22 @@ func remaining_attribute_points() -> int:
 
 
 ## Points still unspent on skills.
+##
+## R-S1-8.  A skill's total point cost is triangular: reaching level L
+## costs L*(L+1)/2 points (level 1 = 1, level 2 = 3, level 3 = 6, ...).
+## Raising a skill from level L-1 to level L costs L points (the marginal
+## cost equals the target level).  A skill package is a flat fee in
+## points; it grants its skills up to their package levels for free, and
+## any level above a package base is charged at the standard incremental
+## cost.  The package cost itself is deducted from the same pool.
 func remaining_skill_points() -> int:
 	var spent: int = 0
 	for skill in purchased_skills:
-		spent += int(purchased_skills[skill])
+		var level: int = int(purchased_skills[skill])
+		var base: int = int(package_base_skills.get(skill, 0))
+		# Triangular cost above package base: L*(L+1)/2 - B*(B+1)/2
+		spent += (level * (level + 1) / 2) - (base * (base + 1) / 2)
+	spent += package_flat_cost
 	return skill_points - spent
 
 
