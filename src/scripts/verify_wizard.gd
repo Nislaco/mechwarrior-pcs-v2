@@ -41,7 +41,7 @@ func _run_checks() -> void:
 	await _test_priorities_gate()
 	_test_advantage_purchase()
 	await _test_attribute_allocation()
-	_test_skill_package()
+	await _test_skill_package()
 	_test_export()
 	# Before the finished-state test, which starts a fresh character.
 	_test_export_against_rulebook()
@@ -345,6 +345,14 @@ func _test_skill_package() -> void:
 		bought = str(row.name).trim_prefix("Package_")
 		break
 	_check("UI-AT-5 a skill package can be bought from the UI", not bought.is_empty(), bought)
+	
+	# A flexible package shows a selection panel; confirm it before the
+	# package is applied to the draft.
+	var pkg_panel: PanelContainer = panel.get_node_or_null("PackageSelectPanel")
+	if pkg_panel != null and pkg_panel.visible:
+		pkg_panel.get_node("VBox/ButtonRow/ConfirmPurchase").pressed.emit()
+		# Give the UI a frame to settle.
+		await process_frame
 	_check("UI-AT-5 the package grants skills",
 		wizard.draft.purchased_skills.size() > 0,
 		str(wizard.draft.purchased_skills.size()))
