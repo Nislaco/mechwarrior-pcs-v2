@@ -223,6 +223,7 @@ func _on_save_report_btn_pressed() -> void:
 
 ## Write the report text to the chosen file and show a confirmation.
 func _on_file_selected(file_path: String) -> void:
+	push_warning("File selected: %s" % file_path)
 	_save_dialog.hide()
 	
 	var report_text: String = _sheet.text
@@ -230,8 +231,10 @@ func _on_file_selected(file_path: String) -> void:
 	if file != null:
 		file.store_string(report_text)
 		file.close()
+		push_warning("File written successfully")
 		_saved_label.text = "[b][color=#8ce08c]Report saved[/color][/b]\n  written to [code]%s[/code]" % file_path
 	else:
+		push_warning("File write failed")
 		_saved_label.text = "[b][color=#f28f78]Failed to write report[/color][/b]\n  unable to write to [code]%s[/code]" % file_path
 
 
