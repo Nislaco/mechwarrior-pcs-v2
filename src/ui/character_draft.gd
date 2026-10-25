@@ -2,7 +2,7 @@ extends RefCounted
 
 ## In-progress character, carried across the wizard steps.
 ##
-## Pure state: the wizard's steps read and write this, and the rules
+## Pure state: the wizard steps read and write this, and the rules
 ## engine (src/rules/) is the only thing that interprets it. That keeps
 ## the UI a thin shell over verified logic.
 
@@ -53,10 +53,6 @@ var package_base_skills: Dictionary = {}  # skill -> level granted by package
 var package_flat_cost: int = 0
 var skill_targets: Dictionary = {}
 
-# --- Equipment (R-S1-9) ---
-var equipment: Array = []
-var credits: int = 50000
-
 # --- Derived ---
 var service_notes: Array[String] = []
 
@@ -96,7 +92,7 @@ func remaining_attribute_points() -> int:
 
 ## Points still unspent on skills.
 ##
-## R-S1-8.  A skill's total point cost is triangular: reaching level L
+## R-S1-8.  A skill total point cost is triangular: reaching level L
 ## costs L*(L+1)/2 points (level 1 = 1, level 2 = 3, level 3 = 6, ...).
 ## Raising a skill from level L-1 to level L costs L points (the marginal
 ## cost equals the target level).  A skill package is a flat fee in
@@ -122,27 +118,29 @@ func remaining_advantage_points() -> int:
 	return advantage_points - spent
 
 
-## Credits still available for equipment.
+## Asset credits: the character starting nest egg in C-Bills.
 ##
-## A character does NOT have to spend all of its credits. What is left
-## over is still the character's. R-S1-9.
-func remaining_credits() -> int:
-	return credits - SkillRules.equipment_total_cost(equipment)
-
-
-## The cost of the equipment the character is carrying.
-func equipment_cost() -> int:
-	return SkillRules.equipment_total_cost(equipment)
+## Base: 500 C-Bills (no Wealth advantage).
+## Wealth advantage: replaces the base with 5,000 / 50,000 / 500,000 C-Bills.
+## Well-Equipped: gives equipment allowance, NOT added to initial assets.
+## R-S1-9 (Assets section p. 12 of 2e book).
+func asset_credits() -> int:
+	# Base 500 C-Bills, or Wealth tier amount if purchased
+	for advantage in purchased_advantages:
+		if advantage.begins_with("Wealth ("):
+			if advantage == "Wealth (5,000 C-Bills)":
+				return 5000
+			if advantage == "Wealth (50,000 C-Bills)":
+				return 50000
+			if advantage == "Wealth (500,000 C-Bills)":
+				return 500000
+	return 500
 
 
 ## Build the exportable character sheet. R-S1-10.
 ##
-## The exported `credits` is the character's credit POOL, not the balance
-## left after the equipment. That is what the reference schema means by
-## it: every reference sample character stores a fixed pool (5,000 /
-## 25,000 / 50,000) that does not change with what the character buys,
-## and one of them carries more equipment than its pool entirely. The
-## balance left over is derived from the pool and the equipment.
+## The exported  is the character asset pool (starting nest egg)
+## in C-Bills. Derived from the Wealth advantage or base 500 C-Bills.
 func to_character_sheet() -> Dictionary:
 	return SkillRules.build_character_sheet(
 		name,
@@ -153,10 +151,9 @@ func to_character_sheet() -> Dictionary:
 		characteristics,
 		purchased_advantages,
 		purchased_skills,
-		equipment,
-		credits,
 		skill_targets,
-		_service_note_text()
+		_service_note_text(),
+		asset_credits()
 	)
 
 

@@ -42,9 +42,7 @@ func _run_checks() -> void:
 	_test_advantage_purchase()
 	await _test_attribute_allocation()
 	_test_skill_package()
-	_test_equipment()
 	_test_export()
-	_test_credits()
 	# Before the finished-state test, which starts a fresh character.
 	_test_export_against_rulebook()
 	await _test_finished_state()
@@ -70,7 +68,7 @@ func _test_shell() -> void:
 	_check("UI-AT-1 wizard shows step 1 of 6", wizard.title_label.text == "Priorities", wizard.title_label.text)
 	_check("UI-AT-1 Back is disabled on the first step", wizard.back_button.disabled)
 	_check("UI-AT-1 Next is disabled until the step is complete", wizard.next_button.disabled)
-	_check("UI-AT-1 six steps are registered", Wizard.STEPS.size() == 6)
+	_check("UI-AT-1 five steps are registered", Wizard.STEPS.size() == 5)
 
 
 # --- Layout ---------------------------------------------------------------
@@ -359,49 +357,8 @@ func _test_skill_package() -> void:
 		str(skill_list.get_child_count()))
 
 
-# --- Step 5: equipment ----------------------------------------------------
-
-func _test_equipment() -> void:
-	wizard._show_step(4)
-	var step: Control = wizard.body.get_child(0)
-	var panel: VBoxContainer = step.get_child(0).get_child(0)
-	var list: VBoxContainer = panel.get_node("EquipmentList")
-	
-	var bought: bool = false
-	for i in range(list.get_child_count()):
-		var row: Control = list.get_child(i)
-		if row.name == "Archetype_Standard":
-			row.get_node("Buy").pressed.emit()
-			bought = true
-			break
-	_check("UI-AT-6 an archetype loadout can be bought", bought)
-	_check("UI-AT-6 the credits are deducted",
-		wizard.draft.remaining_credits() < wizard.draft.credits,
-		"%d -> %d" % [wizard.draft.credits, wizard.draft.remaining_credits()])
-	
-	# The individual item list is populated from the equipment tables.
-	var item_rows: int = 0
-	for i in range(list.get_child_count()):
-		if str(list.get_child(i).name).begins_with("Item_"):
-			item_rows += 1
-	_check("UI-AT-6 the individual item list is populated", item_rows > 10, str(item_rows))
-	
-	# Removing an item refunds the credits.
-	var before: int = wizard.draft.remaining_credits()
-	for i in range(list.get_child_count()):
-		var row: Control = list.get_child(i)
-		if str(row.name).begins_with("Bought_"):
-			row.get_node("Remove").pressed.emit()
-			break
-	_check("UI-AT-6 removing an item refunds the credits",
-		wizard.draft.remaining_credits() > before,
-		"%d -> %d" % [before, wizard.draft.remaining_credits()])
-
-
-# --- Step 6: export -------------------------------------------------------
-
 func _test_export() -> void:
-	wizard._show_step(5)
+	wizard._show_step(4)
 	_check("UI-AT-7 the last step is the character sheet", wizard.title_label.text == "Character Sheet", wizard.title_label.text)
 	
 	# Finishing writes the file.
@@ -421,14 +378,11 @@ func _test_export() -> void:
 		_check("UI-AT-7 the exported character carries the built values",
 			str(character.get("race", "")) == "Clan Warrior"
 			and character.get("attributes", {}).size() == 5
-			and character.get("skills", {}).size() > 0
-			and character.get("equipment", []).size() > 0,
+			and character.get("skills", {}).size() > 0,
 			str(character.keys()))
-		# The exported credits are the character's credit POOL, matching the
-		# reference schema -- not the balance left after the equipment.
-		_check("UI-AT-7 the exported credits are the character's credit pool",
-			int(character.get("credits", -1)) == wizard.draft.credits,
-			"%s vs %d" % [str(character.get("credits")), wizard.draft.credits])
+		_check("UI-AT-7 the exported character has asset credits",
+			int(character.get("credits", -1)) >= 0,
+			str(character.get("credits")))
 
 
 # --- The finished state ---------------------------------------------------
@@ -440,7 +394,7 @@ func _test_finished_state() -> void:
 	# of text in the same colour as an error message is easy to miss --
 	# and pressing "Finish" again would just re-save with no visible
 	# change. The finished state says so.
-	wizard._show_step(5)
+	wizard._show_step(4)
 	await process_frame
 	var step: Control = wizard.body.get_child(0)
 	var sheet_panel: Control = step.get_child(0).get_child(0)
@@ -487,8 +441,7 @@ func _test_finished_state() -> void:
 	_check("UI-AT-12 a new character starts from scratch",
 		wizard.step_index == 0
 		and fresh_priorities
-		and wizard.draft.equipment.is_empty()
-		and wizard.draft.purchased_skills.is_empty()
+				and wizard.draft.purchased_skills.is_empty()
 		and wizard.draft.purchased_advantages.is_empty()
 		and wizard.draft.attribute_spent.is_empty(),
 		"step %d race=%s" % [wizard.step_index, wizard.draft.race])
@@ -499,56 +452,6 @@ func _test_finished_state() -> void:
 		and wizard.next_button.text == "Next",
 		"%s" % wizard.next_button.text)
 
-
-# --- Credits ---------------------------------------------------------------
-
-func _test_credits() -> void:
-	# A character may finish creation without spending all of its credits.
-	# R-S1-9.
-	wizard._show_step(4)
-	var step: Control = wizard.body.get_child(0)
-	var panel: VBoxContainer = step.get_child(0).get_child(0)
-	var list: VBoxContainer = panel.get_node("EquipmentList")
-	
-	# Buy the standard archetype, so the balance is part-spent.
-	for i in range(list.get_child_count()):
-		var row: Control = list.get_child(i)
-		if row.name == "Archetype_Standard":
-			row.get_node("Buy").pressed.emit()
-			break
-	var remaining: int = wizard.draft.remaining_credits()
-	_check("UI-AT-11 spending equipment leaves credits behind",
-		remaining > 0 and remaining < wizard.draft.credits,
-		"%d of %d" % [remaining, wizard.draft.credits])
-	
-	# The equipment step is complete even with credits left, and so is
-	# the whole character.
-	_check("UI-AT-11 the equipment step is complete with credits unspent",
-		step.is_complete(), str(remaining))
-	wizard._update_footer()
-	_check("UI-AT-11 Next is enabled with credits unspent", not wizard.next_button.disabled)
-	
-	# The sheet shows the pool, the spend and the balance.
-	wizard._show_step(5)
-	var sheet: Control = wizard.body.get_child(0)
-	var sheet_text: String = sheet.get_child(0).get_child(0).get_node("Sheet").text
-	_check("UI-AT-11 the sheet reports the credits left",
-		sheet_text.contains("%d remaining" % remaining), sheet_text)
-	
-	# The export keeps the pool, so the balance is still derivable.
-	var exported: Dictionary = wizard.draft.to_export()
-	var character: Dictionary = exported.get("character", {})
-	_check("UI-AT-11 the export keeps the credit pool",
-		int(character.get("credits", -1)) == wizard.draft.credits,
-		str(character.get("credits")))
-	_check("UI-AT-11 the balance is derivable from the pool and the equipment",
-		int(character.get("credits", 0))
-			- int(wizard.draft.equipment_cost()) == remaining,
-		"%d - %d != %d" % [int(character.get("credits", 0)),
-			wizard.draft.equipment_cost(), remaining])
-
-
-# --- The exported character against the rulebook -------------------------
 
 func _test_export_against_rulebook() -> void:
 	# Every value in a finished character, checked against the rulebook

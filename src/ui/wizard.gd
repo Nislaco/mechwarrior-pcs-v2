@@ -4,7 +4,7 @@ extends Control
 ##
 ## The flow mirrors the Python reference (mw-depo/mw-script/chargen.py):
 ##   1. Priorities      2. Advantages     3. Attributes
-##   4. Skills          5. Equipment      6. Character sheet
+##   4. Skills          5. Character sheet
 ##
 ## The wizard is a thin shell: every rule decision is delegated to the
 ## verified engine in src/rules/, and every step is a Control that
@@ -22,7 +22,6 @@ const STEPS: Array[String] = [
 	"res://ui/steps/step_advantages.gd",
 	"res://ui/steps/step_attributes.gd",
 	"res://ui/steps/step_skills.gd",
-	"res://ui/steps/step_equipment.gd",
 	"res://ui/steps/step_summary.gd",
 ]
 
@@ -31,7 +30,6 @@ const STEP_TITLES: Array[String] = [
 	"Advantages",
 	"Attributes",
 	"Skills",
-	"Equipment",
 	"Character Sheet",
 ]
 
@@ -276,12 +274,10 @@ func _finish() -> void:
 	next_button.text = "Saved"
 	next_button.disabled = true
 	new_character_button.visible = true
-	_show_message("Character saved to %s.  %d skills, %d advantages, %d pieces of equipment, %d credits remaining." % [
+	_show_message("Character saved to %s.  %d skills, %d advantages." % [
 		SAVE_PATH,
 		draft.purchased_skills.size(),
 		draft.purchased_advantages.size(),
-		draft.equipment.size(),
-		draft.remaining_credits(),
 	], true)
 
 

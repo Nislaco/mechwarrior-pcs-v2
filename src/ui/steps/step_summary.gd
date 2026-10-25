@@ -1,13 +1,18 @@
 extends VBoxContainer
 
-## Step 6 - Character sheet.
+## Step 5 - Character Sheet (Finishing Touches).
 ##
 ## Shows the finished character and writes the export. R-S1-10.
+##
+## The report mirrors the Python reference (mw-depo/mw-script/chargen.py):
+## priorities, attributes, saving throws, characteristics, advantages,
+## skills, skill targets, and a service-eligibility note.
 
 var draft: RefCounted
 var wizard: Control
 
 const Draft := preload("res://ui/character_draft.gd")
+const Rules := preload("res://rules/mw_rules.gd")
 
 var _sheet: RichTextLabel
 var _saved_panel: PanelContainer
@@ -68,60 +73,121 @@ func _refresh() -> void:
 	if _sheet == null:
 		return
 	var lines: Array[String] = []
-	lines.append("[b]%s[/b]" % (draft.name if not draft.name.is_empty() else "Unnamed character"))
-	lines.append("Race: [b]%s[/b]    Vehicle Class: %s" % [draft.race, draft.vehicle_class])
+	
+	# Header
+	lines.append("[b]FINAL REPORT[/b]")
 	lines.append("")
 	
-	lines.append("[b]Priorities[/b]")
+	# Character Priorities
+	lines.append("[b]Character Priorities:[/b]")
+	var resolved: Dictionary = Rules.resolve_priorities(draft.priorities)
 	for category in draft.priorities:
-		lines.append("  %s: %d" % [category, int(draft.priorities[category])])
+		var level: int = int(draft.priorities[category])
+		var value: Variant = Rules.PRIORITY_VALUES.get(category, {}).get(level, "?")
+		lines.append("  %s: Priority %d (%s)" % [category, level, str(value)])
 	lines.append("")
 	
-	lines.append("[b]Attributes[/b]  (base points -> final value)")
-	for attribute in draft.attribute_spent:
-		lines.append("  %-10s %2d points -> %d" % [
-			attribute, int(draft.attribute_spent[attribute]),
-			int(draft.final_attributes.get(attribute, 0))])
+	# Attributes
+	lines.append("[b]Attributes:[/b]")
+	for attribute in draft.final_attributes:
+		lines.append("  %s: %d" % [attribute, int(draft.final_attributes[attribute])])
 	lines.append("")
 	
-	lines.append("[b]Saving throws[/b]")
+	# Saving Throws
+	lines.append("[b]Saving Throws:[/b]")
 	for attribute in draft.saving_throws:
-		lines.append("  %-10s %d" % [attribute, int(draft.saving_throws[attribute])])
+		lines.append("  %s: %d" % [attribute, int(draft.saving_throws[attribute])])
 	lines.append("")
 	
-	lines.append("[b]Characteristics[/b]")
+	# Characteristics
+	lines.append("[b]Characteristics:[/b]")
 	for characteristic in draft.characteristics:
-		lines.append("  %-10s %d" % [characteristic, int(draft.characteristics[characteristic])])
+		lines.append("  %s: %d" % [characteristic, int(draft.characteristics[characteristic])])
 	lines.append("")
 	
-	lines.append("[b]Advantages[/b]")
+	# Advantages
+	lines.append("[b]Advantages:[/b]")
 	if draft.purchased_advantages.is_empty():
-		lines.append("  (none)")
-	for advantage in draft.purchased_advantages:
-		lines.append("  %s  (%d points)" % [advantage, int(draft.purchased_advantages[advantage])])
+		lines.append("  None")
+	else:
+		for advantage in draft.purchased_advantages:
+			var cost: int = int(draft.purchased_advantages[advantage])
+			if cost == 0:
+				lines.append("  %s (included free - Elemental racial trait)" % advantage)
+			else:
+				lines.append("  %s (%d points)" % [advantage, cost])
 	lines.append("")
 	
-	lines.append("[b]Skills[/b]  (remaining points: %d)" % draft.remaining_skill_points())
-	for skill in draft.purchased_skills:
-		lines.append("  %-28s %d" % [skill, int(draft.purchased_skills[skill])])
+	# Skills
+	lines.append("[b]Skills:[/b]")
+	if not draft.selected_package.is_empty():
+		lines.append("  Selected Skill Package: %s" % draft.selected_package)
+	if draft.purchased_skills.is_empty():
+		lines.append("  None")
+	else:
+		for skill in draft.purchased_skills:
+			var level: int = int(draft.purchased_skills[skill])
+			if level > 0:
+				lines.append("  %s: Level %d" % [skill, level])
 	lines.append("")
 	
-	lines.append("[b]Equipment[/b]")
-	for item in draft.equipment:
-		lines.append("  %-28s %d credits" % [str(item.get("name", "?")), int(item.get("cost", 0))])
+	# Skill Targets
+	var targets := _compute_skill_targets()
+	lines.append("[b]Skill Targets:[/b]")
+	if targets.is_empty():
+		lines.append("  None")
+	else:
+		for skill in targets:
+			lines.append("  %s: %d" % [skill, int(targets[skill])])
 	lines.append("")
 	
-	# The character's credit pool, and the balance left after the
-	# equipment. The balance does not have to be zero: a character may
-	# finish creation without spending all of its credits.
-	lines.append("[b]Credits[/b]  %d total  -  %d spent on equipment  -  %d remaining" % [
-		draft.credits, draft.equipment_cost(), draft.remaining_credits()])
+	# Assets
+	lines.append("[b]Assets:[/b]  %d C-Bills" % draft.asset_credits())
 	lines.append("")
 	
+	# Service Eligibility Note
 	if not draft.service_notes.is_empty():
 		lines.append("[color=#f0c878][i]" + " | ".join(draft.service_notes) + "[/i][/color]")
 	
 	_sheet.text = "\n".join(lines)
+
+
+## Compute the skill targets for each purchased skill.
+## Target = characteristic base - skill level.
+func _compute_skill_targets() -> Dictionary:
+	var targets: Dictionary = {}
+	for skill in draft.purchased_skills:
+		var level: int = int(draft.purchased_skills[skill])
+		if level <= 0:
+			continue
+		var char_name := _skill_characteristic(skill)
+		if char_name.is_empty():
+			continue
+		var char_value: int = int(draft.characteristics.get(char_name, 0))
+		targets[skill] = char_value - level
+	return targets
+
+
+## The characteristic a skill rolls against.
+func _skill_characteristic(skill: String) -> String:
+	match skill:
+		"Acrobatics", "Archery", "Blade", "Climbing", "Jump Pack", "Running", "Swimming", "Unarmed Combat":
+			return "Athletic"
+		"Administration", "Alternate Identity", "Appraisal", "Computer", "Cryptography", "Demolitions", \
+		 "Engineering", "Forgery", "Gambling", "Medtech", "Navigation", "Perception", "Security Systems", \
+		 "Special Interests", "Strategy", "Survival", "Tactics", "Technician/Aerospace", "Technician/BattleMech", \
+		 "Technician/Battlesuit", "Technician/Electronics", "Technician/Mechanic", "Technician/Spacecraft", \
+		 "Technician/Weapons", "Tinker", "Tracking", "Communications/Conventional", "Communications/Hyperpulse Generator":
+			return "Mental"
+		"Drive/Ground", "Drive/Naval", "Escape Artist", "Gunnery/Aerospace", "Gunnery/Artillery", \
+		 "Gunnery/BattleMech", "Gunnery/Battlesuit", "Gunnery/Conventional", "Gunnery/Spacecraft", \
+		 "Piloting/Aerospace", "Piloting/BattleMech", "Piloting/Spacecraft", "Piloting/VTOL", \
+		 "Quickdraw", "Small Arms", "Stealth", "Support Weapons", "Throwing Weapons", "Zero-G Operations":
+			return "Physical"
+		"Bureaucracy", "Impersonation", "Interrogation", "Leadership", "Negotiation", "Protocol", \
+		 "Scrounge", "Seduction", "Streetwise", "Training", "Career Skills":
+			return "Social"
+	return ""
 
 
 ## Write the character and show the confirmation. R-S1-10.

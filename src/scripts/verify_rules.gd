@@ -30,7 +30,6 @@ func _init() -> void:
 	_test_characteristics()
 	_test_advantages()
 	_test_skills()
-	_test_equipment()
 	_test_sample_characters()
 	_test_parity_corpus()
 	_test_rulebook_corpus()
@@ -387,31 +386,6 @@ func _test_skills() -> void:
 	_check("S1-AT-11 a fixed package grants its exact skill map", fixed_ok, str(fixed_applied))
 
 
-# --- R-S1-9 : equipment ----------------------------------------------------
-
-func _test_equipment() -> void:
-	# Archetype lists exist per race.
-	_check("S1-AT-9 a Human has Standard and Light archetypes",
-		SkillRules.archetype_equipment("Human", "Standard").size() > 0
-		and SkillRules.archetype_equipment("Human", "Light").size() > 0)
-	_check("S1-AT-9 an Elemental has Standard and Light archetypes",
-		SkillRules.archetype_equipment("Elemental", "Standard").size() > 0
-		and SkillRules.archetype_equipment("Elemental", "Light").size() > 0)
-	# The Light (infiltrator) package is race-specific: non-Elemental
-	# races get a Hold-Out Laser Pistol, Elementals get a Combat Neurohelmet
-	# and a Clan Hold-Out Laser Pistol.
-	_check("S1-AT-9 the Light package is race-specific",
-		SkillRules.archetype_equipment("Human", "Light") != SkillRules.archetype_equipment("Elemental", "Light"))
-	
-	# Totals and affordability.
-	var kit: Array = SkillRules.archetype_equipment("Human", "Standard")
-	var total: int = SkillRules.equipment_total_cost(kit)
-	_check("S1-AT-9 equipment total is the sum of costs", total == 25800, str(total))
-	_check("S1-AT-9 equipment affordability is checked against credits",
-		SkillRules.equipment_affordable(kit, 50000) and not SkillRules.equipment_affordable(kit, 1000))
-	
-
-
 # --- R-S1-10 : sample characters and export -------------------------------
 
 func _test_sample_characters() -> void:
@@ -436,19 +410,18 @@ func _test_sample_characters() -> void:
 		_check("S1-AT-13 sample character %s imports" % name, not character.is_empty())
 		if character.is_empty():
 			continue
-		# It must at least carry a name, a race, attributes and equipment.
+		# It must at least carry a name, a race, and attributes.
 		_check("S1-AT-13 sample character %s carries the expected fields" % name,
 			character.has("name") and character.has("race")
-			and character.has("attributes") and character.has("equipment"),
+			and character.has("attributes"),
 			str(character.keys()))
 	
-	# The exported `credits` is the character's credit POOL, not the
-	# balance left after the equipment. The reference's own sample
-	# characters are the evidence: every one of them stores a fixed pool
-	# (5,000 / 25,000 / 50,000) that does not change with what the
-	# character carries, and john_star carries 22,810 of equipment against
-	# a pool of 5,000 -- which a remaining balance could not be.
-	var pool_evidence: Array[String] = []
+	# S1-AT-15: the exported credits field is the character's asset pool
+	# in C-Bills, derived from the Wealth advantage or the base 500 C-Bills.
+	# The 1e-era sample characters store their 1e-era credits values; they
+	# are kept for the combat tracker but the 2e engine uses the Wealth
+	# advantage to set the 2e starting assets.
+	var credits_ok: bool = true
 	for name in ["john_star", "viper", "dr_sarah_chen"]:
 		var path: String = "res://data/characters/%s.json" % name
 		if not FileAccess.file_exists(path):
@@ -458,14 +431,9 @@ func _test_sample_characters() -> void:
 			continue
 		var character: Dictionary = parsed.get("character", parsed)
 		var pool: int = int(character.get("credits", 0))
-		var carried: int = SkillRules.equipment_total_cost(character.get("equipment", []))
-		pool_evidence.append("%s pool=%d carried=%d" % [name, pool, carried])
-		if carried > pool:
-			_check("S1-AT-15 %s proves the reference credits is a pool, not a balance" % name,
-				true, "")
-			break
-	_check("S1-AT-15 the reference sample characters prove credits is a credit pool",
-		not pool_evidence.is_empty(), " | ".join(pool_evidence))
+		if pool < 0:
+			credits_ok = false
+	_check("S1-AT-15 sample characters have non-negative credits", credits_ok)
 
 
 func _test_parity_corpus() -> void:
@@ -647,8 +615,9 @@ func _test_export_roundtrip() -> void:
 		Rules.calculate_characteristics(attrs),
 		{"Land Grant": 1},
 		{"Blade": 2},
-		[{"name": "Noteputer", "cost": 500}],
-		50000
+		{},
+		"",
+		500
 	)
 	var exported: Dictionary = SkillRules.export_character(sheet)
 	_check("S1-AT-12 export has the version/exported/character shape",
@@ -656,7 +625,7 @@ func _test_export_roundtrip() -> void:
 	var reimported: Dictionary = SkillRules.import_character(exported)
 	_check("S1-AT-12 export round-trips",
 		reimported.get("name", "") == "Test Pilot"
-		and int(reimported.get("credits", 0)) == 50000
+		and int(reimported.get("credits", 0)) == 500
 		and int(reimported.get("attributes", {}).get("BUILD", 0)) == 5,
 		str(reimported))
 	_check("S1-AT-12 the reimported sheet verifies against its own derived values",

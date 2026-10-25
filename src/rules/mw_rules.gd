@@ -86,8 +86,6 @@ const CLAN_ONLY_ADVANTAGES: Array[String] = ["Bloodname", "Enhanced Imaging (EI)
 ## Characteristic formulas. R-S1-7.
 const CHARACTERISTIC_BASE: int = 18
 
-## Default starting credits.
-const DEFAULT_CREDITS: int = 50000
 
 ## Service-eligibility minimums (advisory, not blocking). R-S1-5.
 const SERVICE_MIN_INNER_SPHERE: int = 4

@@ -1,7 +1,7 @@
 extends RefCounted
 
 ## MechWarrior 2e character-creation rules engine, part 2:
-## skills, equipment, and character-sheet export.
+## skills and character-sheet export.
 ##
 ## Pure logic: no UI, no scene tree. See mw_rules.gd for the shared tables
 ## and the rule contract (design/systems/character-creation.md).
@@ -149,110 +149,6 @@ static func apply_flexible_package(package_spec: Dictionary, choices: Dictionary
 
 
 # ---------------------------------------------------------------------------
-# R-S1-9 — equipment
-# ---------------------------------------------------------------------------
-
-## Archetype equipment lists. Costs and item sets are as in the Python
-## reference. The Standard and Light (infiltrator) variants are source
-## material; some items (e.g. the neural implants, hold-out pistols) are
-## archetype-only and do not appear in the individual purchase tables.
-const ARCHETYPE_EQUIPMENT: Dictionary = {
-	"Human": {
-		"Standard": [
-			{"name": "Standard Neural Implant", "cost": 1000},
-			{"name": "MechWarrior Combat Suit", "cost": 20000},
-			{"name": "Combat Neurohelmet", "cost": 1400},
-			{"name": "Neurohelmet", "cost": 900},
-			{"name": "Standard Laser Pistol", "cost": 750},
-			{"name": "Standard Laser Rifle", "cost": 1250},
-			{"name": "Noteputer", "cost": 500},
-		],
-		"Light": [
-			{"name": "Light Neural Implant", "cost": 500},
-			{"name": "Ablative Vest", "cost": 400},
-			{"name": "Hold-Out Laser Pistol", "cost": 100},
-			{"name": "Noteputer", "cost": 500},
-		],
-	},
-	"Clan Warrior": {
-		"Standard": [
-			{"name": "Standard Neural Implant", "cost": 1000},
-			{"name": "MechWarrior Combat Suit", "cost": 20000},
-			{"name": "Combat Neurohelmet", "cost": 1400},
-			{"name": "Neurohelmet", "cost": 900},
-			{"name": "Standard Laser Pistol", "cost": 750},
-			{"name": "Standard Laser Rifle", "cost": 1250},
-			{"name": "Noteputer", "cost": 500},
-		],
-		"Light": [
-			{"name": "Light Neural Implant", "cost": 500},
-			{"name": "Ablative Vest", "cost": 400},
-			{"name": "Hold-Out Laser Pistol", "cost": 100},
-			{"name": "Noteputer", "cost": 500},
-		],
-	},
-	"Clan Pilot": {
-		"Standard": [
-			{"name": "Standard Neural Implant", "cost": 1000},
-			{"name": "MechWarrior Combat Suit", "cost": 20000},
-			{"name": "Combat Neurohelmet", "cost": 1400},
-			{"name": "Neurohelmet", "cost": 900},
-			{"name": "Standard Laser Pistol", "cost": 750},
-			{"name": "Standard Laser Rifle", "cost": 1250},
-			{"name": "Noteputer", "cost": 500},
-		],
-		"Light": [
-			{"name": "Light Neural Implant", "cost": 500},
-			{"name": "Ablative Vest", "cost": 400},
-			{"name": "Hold-Out Laser Pistol", "cost": 100},
-			{"name": "Noteputer", "cost": 500},
-		],
-	},
-	"Elemental": {
-		"Standard": [
-			{"name": "Standard Neural Implant", "cost": 1000},
-			{"name": "Clan Battle Armor", "cost": 20000},
-			{"name": "Clan Neurohelmet", "cost": 5000},
-			{"name": "Clan Laser Pistol", "cost": 750},
-			{"name": "Clan Laser Rifle", "cost": 1250},
-			{"name": "Noteputer", "cost": 500},
-		],
-		"Light": [
-			{"name": "Light Neural Implant", "cost": 500},
-			{"name": "Ablative Vest", "cost": 400},
-			{"name": "Combat Neurohelmet", "cost": 1400},
-			{"name": "Clan Hold-Out Laser Pistol", "cost": 100},
-			{"name": "Noteputer", "cost": 500},
-		],
-	},
-}
-
-## The archetype equipment list for a race. R-S1-9.
-static func archetype_equipment(race: String, variant: String) -> Array:
-	if not ARCHETYPE_EQUIPMENT.has(race):
-		return []
-	var by_variant: Dictionary = ARCHETYPE_EQUIPMENT[race]
-	if not by_variant.has(variant):
-		return []
-	return (by_variant[variant] as Array).duplicate(true)
-
-
-## Total cost of an equipment list. R-S1-9.
-static func equipment_total_cost(equipment: Array) -> int:
-	var total: int = 0
-	for item in equipment:
-		total += int(item.get("cost", 0))
-	return total
-
-
-## Can this equipment list be afforded? R-S1-9.
-static func equipment_affordable(equipment: Array, credits: int) -> bool:
-	return equipment_total_cost(equipment) <= credits
-
-
-
-
-# ---------------------------------------------------------------------------
 # R-S1-10 — character sheet and export
 # ---------------------------------------------------------------------------
 
@@ -267,10 +163,9 @@ static func build_character_sheet(
 		characteristics: Dictionary,
 		advantages: Dictionary,
 		skills: Dictionary,
-		equipment: Array,
-		credits: int,
 		skill_targets: Dictionary = {},
-		notes: String = "") -> Dictionary:
+		notes: String = "",
+		credits: int = 0) -> Dictionary:
 	var modifiers: Dictionary = Rules.race_modifiers(race)
 	return {
 		"name": name,
@@ -284,16 +179,12 @@ static func build_character_sheet(
 		"advantages": advantages,
 		"skills": skills,
 		"skill_targets": skill_targets,
-		"equipment": equipment,
 		"credits": credits,
 		"notes": notes,
 		"attribute_points_spent": spent_points,
 		"racial_modifiers": modifiers,
 	}
 
-
-## Serialise a character sheet to the reference JSON shape
-## ({version, exported, character}). R-S1-10.
 static func export_character(sheet: Dictionary) -> Dictionary:
 	return {
 		"version": 1,
