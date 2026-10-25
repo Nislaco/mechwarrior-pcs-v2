@@ -17,6 +17,9 @@ const Rules := preload("res://rules/mw_rules.gd")
 var _sheet: RichTextLabel
 var _saved_panel: PanelContainer
 var _saved_label: RichTextLabel
+var _save_dialog: FileDialog
+var _save_report_btn: Button
+var _panel: VBoxContainer
 
 
 func build(_body: Control) -> void:
@@ -27,11 +30,11 @@ func build(_body: Control) -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
 	
-	var panel := VBoxContainer.new()
-	panel.name = "SheetPanel"
-	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.add_theme_constant_override("separation", 8)
-	scroll.add_child(panel)
+	_panel = VBoxContainer.new()
+	_panel.name = "SheetPanel"
+	_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_panel.add_theme_constant_override("separation", 8)
+	scroll.add_child(_panel)
 	
 	# The confirmation that the character was written. This has to be
 	# obvious: the character is saved, the wizard stays open, and a thin
@@ -49,7 +52,7 @@ func build(_body: Control) -> void:
 	style.bg_color = Color(0.12, 0.20, 0.14)
 	style.set_content_margin_all(10)
 	_saved_panel.add_theme_stylebox_override("panel", style)
-	panel.add_child(_saved_panel)
+	_panel.add_child(_saved_panel)
 	
 	_saved_label = RichTextLabel.new()
 	_saved_label.name = "SavedLabel"
@@ -58,13 +61,22 @@ func build(_body: Control) -> void:
 	_saved_label.fit_content = true
 	_saved_panel.add_child(_saved_label)
 	
+	# Button to save the report as a text file in a user-chosen location.
+	_save_report_btn = Button.new()
+	_save_report_btn.name = "SaveReportButton"
+	_save_report_btn.text = "Save Report"
+	_save_report_btn.custom_minimum_size = Vector2(120, 36)
+	_save_report_btn.add_theme_font_size_override("font_size", 14)
+	_save_report_btn.pressed.connect(_on_save_report_btn_pressed)
+	_panel.add_child(_save_report_btn)
+	
 	_sheet = RichTextLabel.new()
 	_sheet.name = "Sheet"
 	_sheet.focus_mode = Control.FOCUS_NONE
 	_sheet.bbcode_enabled = true
 	_sheet.fit_content = true
 	_sheet.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.add_child(_sheet)
+	_panel.add_child(_sheet)
 	
 	_refresh()
 
@@ -188,6 +200,44 @@ func _skill_characteristic(skill: String) -> String:
 		 "Scrounge", "Seduction", "Streetwise", "Training", "Career Skills":
 			return "Social"
 	return ""
+
+
+## Open the file dialog so the player can choose where to save the report.
+func _on_save_report_btn_pressed() -> void:
+	if _save_dialog == null:
+		_save_dialog = FileDialog.new()
+		_save_dialog.name = "ReportFileDialog"
+		_save_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+		_save_dialog.access_path = "."
+		_save_dialog.file_added.connect(_on_file_added)
+		_save_dialog.canceled.connect(_on_dialog_canceled)
+		_panel.add_child(_save_dialog)
+	
+	# Default to the directory where the character JSON was saved.
+	var saved_path: String = Draft.SAVE_PATH
+	var dir_path: String = saved_path.get_base_dir()
+	_save_dialog.current_dir = dir_path
+	_save_dialog.current_file = "character_report.txt"
+	
+	_save_dialog.popup_centered_ratio()
+
+
+## Write the report text to the chosen file and show a confirmation.
+func _on_file_added(file_path: String) -> void:
+	_save_dialog.hide()
+	
+	var report_text: String = _sheet.text
+	var file := FileAccess.open(file_path, FileAccess.WRITE)
+	if file != null:
+		file.store_string(report_text)
+		file.close()
+		_saved_label.text = "[b][color=#8ce08c]Report saved[/color][/b]\n  written to [code]%s[/code]" % file_path
+	else:
+		_saved_label.text = "[b][color=#f28f78]Failed to write report[/color][/b]\n  unable to write to [code]%s[/code]" % file_path
+
+
+func _on_dialog_canceled() -> void:
+	_save_dialog.hide()
 
 
 ## Write the character and show the confirmation. R-S1-10.
