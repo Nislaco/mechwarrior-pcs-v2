@@ -176,10 +176,12 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 	},
 	"Clan Warrior": {
 		"Standard": [
-			{"name": "Clan Neural Implant", "cost": 1000},
-			{"name": "Clan Armor", "cost": 20000},
-			{"name": "Clan Laser Pistol", "cost": 750},
-			{"name": "Clan Laser Rifle", "cost": 1250},
+			{"name": "Standard Neural Implant", "cost": 1000},
+			{"name": "MechWarrior Combat Suit", "cost": 20000},
+			{"name": "Combat Neurohelmet", "cost": 1400},
+			{"name": "Neurohelmet", "cost": 900},
+			{"name": "Standard Laser Pistol", "cost": 750},
+			{"name": "Standard Laser Rifle", "cost": 1250},
 			{"name": "Noteputer", "cost": 500},
 		],
 		"Light": [
@@ -191,10 +193,12 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 	},
 	"Clan Pilot": {
 		"Standard": [
-			{"name": "Clan Neural Implant", "cost": 1000},
-			{"name": "Clan Armor", "cost": 20000},
-			{"name": "Clan Laser Pistol", "cost": 750},
-			{"name": "Clan Laser Rifle", "cost": 1250},
+			{"name": "Standard Neural Implant", "cost": 1000},
+			{"name": "MechWarrior Combat Suit", "cost": 20000},
+			{"name": "Combat Neurohelmet", "cost": 1400},
+			{"name": "Neurohelmet", "cost": 900},
+			{"name": "Standard Laser Pistol", "cost": 750},
+			{"name": "Standard Laser Rifle", "cost": 1250},
 			{"name": "Noteputer", "cost": 500},
 		],
 		"Light": [
@@ -206,7 +210,7 @@ const ARCHETYPE_EQUIPMENT: Dictionary = {
 	},
 	"Elemental": {
 		"Standard": [
-			{"name": "Clan Neural Implant", "cost": 1000},
+			{"name": "Standard Neural Implant", "cost": 1000},
 			{"name": "Clan Battle Armor", "cost": 20000},
 			{"name": "Clan Neurohelmet", "cost": 5000},
 			{"name": "Clan Laser Pistol", "cost": 750},
