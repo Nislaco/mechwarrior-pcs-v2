@@ -7,3 +7,4 @@ dist/
 # Godot editor cache / import artifacts
 src/.godot/
 *.translation
+export/
