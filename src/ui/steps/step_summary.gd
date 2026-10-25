@@ -226,16 +226,31 @@ func _on_file_selected(file_path: String) -> void:
 	push_warning("File selected: %s" % file_path)
 	_save_dialog.hide()
 	
-	var report_text: String = _sheet.text
+	# Convert BBCode to plain text for the saved file.
+	var plain_text: String = _bbcode_to_plain(_sheet.text)
 	var file := FileAccess.open(file_path, FileAccess.WRITE)
 	if file != null:
-		file.store_string(report_text)
+		file.store_string(plain_text)
 		file.close()
 		push_warning("File written successfully")
 		_saved_label.text = "[b][color=#8ce08c]Report saved[/color][/b]\n  written to [code]%s[/code]" % file_path
 	else:
 		push_warning("File write failed")
 		_saved_label.text = "[b][color=#f28f78]Failed to write report[/color][/b]\n  unable to write to [code]%s[/code]" % file_path
+
+
+## Convert BBCode markup to plain text.
+func _bbcode_to_plain(bbcode: String) -> String:
+	var result: String = bbcode
+	# Remove common BBCode tags and replace with plain text.
+	result = result.replace("[b]", "").replace("[/b]", "")
+	result = result.replace("[i]", "").replace("[/i]", "")
+	result = result.replace("[u]", "").replace("[/u]", "")
+	result = result.replace("[color=#", "").replace("]", "")
+	result = result.replace("[/color]", "")
+	result = result.replace("[code]", "\\n[code]").replace("[/code]", "[/code]")
+	result = result.replace("[url=]", "").replace("[/url]", "")
+	return result
 
 
 func _on_dialog_canceled() -> void:
