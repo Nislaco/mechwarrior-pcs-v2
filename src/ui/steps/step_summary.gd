@@ -210,7 +210,7 @@ func _on_save_report_btn_pressed() -> void:
 		_save_dialog.name = "ReportFileDialog"
 		_save_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 		_save_dialog.access = FileDialog.ACCESS_FILESYSTEM
-		_save_dialog.file_added.connect(_on_file_added)
+		_save_dialog.file_selected.connect(_on_file_selected)
 		_save_dialog.canceled.connect(_on_dialog_canceled)
 		_panel.add_child(_save_dialog)
 	
@@ -222,7 +222,7 @@ func _on_save_report_btn_pressed() -> void:
 
 
 ## Write the report text to the chosen file and show a confirmation.
-func _on_file_added(file_path: String) -> void:
+func _on_file_selected(file_path: String) -> void:
 	_save_dialog.hide()
 	
 	var report_text: String = _sheet.text
