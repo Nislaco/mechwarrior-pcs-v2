@@ -38,14 +38,41 @@ static func packages_for_race(race: String) -> Dictionary:
 	return (_packages[race] as Dictionary).duplicate(true)
 
 
-## Packages a character can still afford, given remaining skill points.
-## R-S1-8.
-static func eligible_packages(race: String, skill_points: int) -> Dictionary:
+## Packages a character can still afford, given remaining skill points
+## and LEARN attribute. R-S1-8.
+##
+## Mirrors the Python reference: a package is only eligible if none of
+## its granted skill levels exceed the character's LEARN attribute.
+## Fixed packages are filtered by their skill map; flexible packages
+## by their skills_at_level slots (levels with count 0 are allowed).
+static func eligible_packages(race: String, skill_points: int, learn: int) -> Dictionary:
+	var max_level := max_skill_level(learn)
 	var eligible: Dictionary = {}
 	for name in packages_for_race(race):
 		var spec: Dictionary = packages_for_race(race)[name]
-		if int(spec.get("cost", 9999)) <= skill_points:
-			eligible[name] = spec
+		if int(spec.get("cost", 9999)) > skill_points:
+			continue
+		# Fixed-skill packages: every granted level must fit LEARN.
+		if "skills" in spec:
+			var fits := true
+			for skill in (spec["skills"] as Dictionary):
+				if int((spec["skills"] as Dictionary)[skill]) > max_level:
+					fits = false
+					break
+			if not fits:
+				continue
+		# Flexible packages: every non-zero slot level must fit LEARN.
+		if "skills_at_level" in spec:
+			var fits := true
+			for level in (spec["skills_at_level"] as Dictionary):
+				var lvl: int = int(level)
+				if lvl > 0 and lvl > max_level:
+					if int((spec["skills_at_level"] as Dictionary)[level]) > 0:
+						fits = false
+						break
+			if not fits:
+				continue
+		eligible[name] = spec
 	return eligible
 
 

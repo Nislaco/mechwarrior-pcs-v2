@@ -103,7 +103,8 @@ func _refresh_packages(remaining: int) -> void:
 		row.add_child(label)
 		_package_list.add_child(row)
 	
-	var eligible: Dictionary = SkillRules.eligible_packages(draft.race, remaining)
+	var learn: int = int(draft.final_attributes.get("LEARN", 0))
+	var eligible: Dictionary = SkillRules.eligible_packages(draft.race, remaining, learn)
 	if eligible.is_empty():
 		var none := Label.new()
 		none.text = "No package is affordable with %d points." % remaining
@@ -212,7 +213,10 @@ func _refresh_skills(_remaining: int) -> void:
 		option.add_item("0", 0)
 		for level in range(1, max_level + 1):
 			option.add_item(str(level), level)
-		option.select(owned)
+		# Clamp: a package may grant a level above LEARN; the dropdown only
+		# has options 0..max_level, so select(mini(owned, max_level)) avoids
+		# the out-of-bounds 'Invalid index' crash in OptionButton.select().
+		option.select(mini(owned, max_level))
 		option.item_selected.connect(_on_skill_level.bind(skill))
 		row.add_child(option)
 		

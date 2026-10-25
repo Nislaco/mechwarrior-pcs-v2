@@ -294,7 +294,7 @@ func _test_skills() -> void:
 	_check("S1-AT-11 Human packages were loaded from data", human_pkgs.size() > 0, str(human_pkgs.size()))
 	var clan_pkgs: Dictionary = SkillRules.packages_for_race("Clan Warrior")
 	_check("S1-AT-11 Clan Warrior has fixed-skill packages", clan_pkgs.size() > 0)
-	var eligible: Dictionary = SkillRules.eligible_packages("Human", 10)
+	var eligible: Dictionary = SkillRules.eligible_packages("Human", 10, 6)
 	var all_affordable: bool = true
 	for name in eligible:
 		if int(eligible[name]["cost"]) > 10:
